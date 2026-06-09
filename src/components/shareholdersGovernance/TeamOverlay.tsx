@@ -52,12 +52,14 @@ const TeamOverlay: React.FC<TeamOverlayProps> = ({ onClose }) => {
 
         {/* ── 오른쪽: 주주 현황 ── */}
         <div className="gov-right-panel">
-          <div className="gov-right-header">
-            <span className="sh-chart-title-label">3. 주주 현황</span>
-          </div>
           <div className="gov-right-body">
             <div className="gov-right-placeholder">
-              <span className="gov-right-placeholder-text">주주 현황 데이터가 여기에 표시됩니다.</span>
+              <div className="gov-d3-toggle">
+                <span className="sh-chart-title-label">3. 주주 현황</span>
+              </div>
+              <div className="gov-right-placeholder-inner">
+                <span className="gov-right-placeholder-text">주주 현황 데이터가 여기에 표시됩니다.</span>
+              </div>
             </div>
           </div>
         </div>
