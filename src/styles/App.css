@@ -1781,17 +1781,12 @@ body::-webkit-scrollbar,
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
-  overflow-y: auto;
-  padding-right: 2px;
-  align-content: start;
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
+  overflow: hidden;
 }
 
-.sh-table-grid::-webkit-scrollbar { width: 4px; }
-.sh-table-grid::-webkit-scrollbar-track { background: transparent; }
-.sh-table-grid::-webkit-scrollbar-thumb { background: rgba(104,78,66,0.2); border-radius: 4px; }
-
-/* ── 회사 카드 (5열 콤팩트) ── */
+/* ── 회사 카드 (5×2 그리드 꽉채움) ── */
 .sh-company-card {
   background: #ffffff;
   border: 1.5px solid var(--border-light, #e8e4de);
@@ -1802,6 +1797,7 @@ body::-webkit-scrollbar,
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
 
 .sh-company-card.active {
@@ -1814,13 +1810,14 @@ body::-webkit-scrollbar,
 }
 
 .sh-card-header {
-  padding: 4px 6px 3px;
+  padding: 6px 8px 5px;
   background: #f8f7f5;
   border-bottom: 1px solid #ece9e4;
+  flex-shrink: 0;
 }
 
 .sh-card-name {
-  font-size: 10.5px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--card-color, #444);
   letter-spacing: -0.02em;
@@ -1834,8 +1831,9 @@ body::-webkit-scrollbar,
 .sh-card-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 9.5px;
+  font-size: 11.5px;
   table-layout: fixed;
+  flex: 1;
 }
 
 .sh-card-table col.col-name { width: 42%; }
@@ -1843,18 +1841,18 @@ body::-webkit-scrollbar,
 .sh-card-table col.col-pct  { width: 30%; }
 
 .sh-card-table tr {
-  border-bottom: 1px solid rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .sh-card-table tr:last-child {
   border-bottom: none;
 }
 
-.sh-row-corp { background: rgba(42, 90, 160, 0.03); }
-.sh-row-ind  { background: rgba(163, 101, 30, 0.03); }
+.sh-row-corp { background: rgba(42, 90, 160, 0.04); }
+.sh-row-ind  { background: rgba(163, 101, 30, 0.04); }
 
 .sh-td-name {
-  padding: 2.5px 2px 2.5px 6px;
+  padding: 4px 2px 4px 7px;
   color: #2c3a30;
   font-weight: 600;
   overflow: hidden;
@@ -1863,25 +1861,25 @@ body::-webkit-scrollbar,
 }
 
 .sh-td-type {
-  padding: 2.5px 2px;
+  padding: 4px 2px;
   text-align: center;
 }
 
 .sh-td-pct {
-  padding: 2.5px 5px 2.5px 1px;
+  padding: 4px 6px 4px 1px;
   text-align: right;
   font-weight: 700;
   color: #2c3a30;
   white-space: nowrap;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 /* ── 주주 유형 뱃지: 법인/개인 ── */
 .sh-type-badge {
   display: inline-block;
-  font-size: 8px;
+  font-size: 9.5px;
   font-weight: 700;
-  padding: 1px 3px;
+  padding: 1px 4px;
   border-radius: 3px;
 }
 
