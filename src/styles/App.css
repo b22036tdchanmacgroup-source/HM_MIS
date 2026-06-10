@@ -1786,113 +1786,170 @@ body::-webkit-scrollbar,
   overflow: hidden;
 }
 
-/* ── 회사 카드 (5×2 그리드 꽉채움) ── */
+/* ── 회사 카드: 지배구조 패널 스타일 매칭 ── */
 .sh-company-card {
-  background: #ffffff;
-  border: 1.5px solid var(--border-light, #e8e4de);
-  border-top: 3px solid var(--card-color, #aaa);
-  border-radius: 7px;
+  background: #faf9f7;
+  border: 1.5px solid var(--border-light, #e5e2db);
+  border-top: 3.5px solid var(--card-color, #aaa);
+  border-radius: 10px;
   overflow: hidden;
   transition: opacity 0.2s, box-shadow 0.22s;
   display: flex;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
 }
 
 .sh-company-card.active {
-  box-shadow: 0 0 0 1.5px var(--card-color, #aaa), 0 3px 12px rgba(0,0,0,0.12);
-  border-top-width: 4px;
+  box-shadow: 0 0 0 2px var(--card-color, #aaa), 0 4px 14px rgba(0,0,0,0.13);
+  border-top-width: 4.5px;
 }
 
 .sh-company-card.dimmed {
   opacity: 0.3;
 }
 
+/* ── 카드 헤더: 로고 + 회사명 ── */
 .sh-card-header {
   padding: 6px 8px 5px;
-  background: #f8f7f5;
-  border-bottom: 1px solid #ece9e4;
+  background: #ede9e4;
+  border-bottom: 1px solid #dedad2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
 }
 
+.sh-card-logo {
+  height: 18px;
+  width: auto;
+  max-width: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.sh-card-logo-placeholder {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  color: white;
+  flex-shrink: 0;
+  background: var(--card-color, #888);
+}
+
 .sh-card-name {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
-  color: var(--card-color, #444);
+  color: var(--card-color, #3e332c);
   letter-spacing: -0.02em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: block;
-}
-
-/* ── 주주 테이블 ── */
-.sh-card-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 11.5px;
-  table-layout: fixed;
   flex: 1;
+  min-width: 0;
 }
 
-.sh-card-table col.col-name { width: 42%; }
-.sh-card-table col.col-type { width: 28%; }
-.sh-card-table col.col-pct  { width: 30%; }
+/* ── 주주 리스트 스크롤 영역 ── */
+.sh-card-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(104,78,66,0.2) transparent;
+}
 
-.sh-card-table tr {
+.sh-card-body::-webkit-scrollbar { width: 3px; }
+.sh-card-body::-webkit-scrollbar-track { background: transparent; }
+.sh-card-body::-webkit-scrollbar-thumb { background: rgba(104,78,66,0.25); border-radius: 3px; }
+
+/* ── 주주 행 (CSS grid 3열) ── */
+.sh-sh-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  padding: 5px 8px;
   border-bottom: 1px solid rgba(0,0,0,0.05);
+  gap: 5px;
+  min-width: 0;
 }
 
-.sh-card-table tr:last-child {
-  border-bottom: none;
-}
+.sh-sh-row:last-child { border-bottom: none; }
 
-.sh-row-corp { background: rgba(42, 90, 160, 0.04); }
-.sh-row-ind  { background: rgba(163, 101, 30, 0.04); }
+/* 법인/개인 색상 구분 (명확한 색조 차이) */
+.sh-row-corp { background: rgba(43, 63, 135, 0.08); }
+.sh-row-ind  { background: rgba(200, 110, 30, 0.09); }
 
 .sh-td-name {
-  padding: 4px 2px 4px 7px;
-  color: #2c3a30;
+  font-size: 13px;
   font-weight: 600;
+  color: #2c3a30;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
 
-.sh-td-type {
-  padding: 4px 2px;
-  text-align: center;
-}
-
-.sh-td-pct {
-  padding: 4px 6px 4px 1px;
-  text-align: right;
-  font-weight: 700;
-  color: #2c3a30;
-  white-space: nowrap;
-  font-size: 11px;
-}
-
-/* ── 주주 유형 뱃지: 법인/개인 ── */
+/* ── 법인/개인 뱃지: 색 강조 ── */
 .sh-type-badge {
   display: inline-block;
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 700;
-  padding: 1px 4px;
+  padding: 2px 5px;
   border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sh-type-badge.corp {
-  background: rgba(42, 90, 160, 0.1);
-  color: #2a5aa0;
-  border: 1px solid rgba(42, 90, 160, 0.25);
+  background: rgba(43, 63, 135, 0.15);
+  color: #2a4898;
+  border: 1px solid rgba(43, 63, 135, 0.30);
 }
 
 .sh-type-badge.ind {
-  background: rgba(163, 101, 30, 0.1);
-  color: #7a4a1a;
-  border: 1px solid rgba(163, 101, 30, 0.22);
+  background: rgba(200, 110, 30, 0.15);
+  color: #8c5010;
+  border: 1px solid rgba(200, 110, 30, 0.32);
+}
+
+.sh-td-pct {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--brown-dark, #3e332c);
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── 합계 행 ── */
+.sh-card-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: #e9e5de;
+  border-top: 1.5px solid #dedad2;
+  flex-shrink: 0;
+}
+
+.sh-total-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sh-total-pct {
+  font-size: 13.5px;
+  font-weight: 900;
+  color: var(--brown-dark);
 }
 
 /* ─── 왼쪽 패널 내 섹션 패딩 축소 ─── */
