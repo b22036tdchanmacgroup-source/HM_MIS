@@ -91,6 +91,11 @@ const TeamOverlay: React.FC<TeamOverlayProps> = ({ onClose }) => {
                     <span className="sh-card-name">{company.name}</span>
                   </div>
                   <table className="sh-card-table">
+                    <colgroup>
+                      <col className="col-name" />
+                      <col className="col-type" />
+                      <col className="col-pct" />
+                    </colgroup>
                     <tbody>
                       {company.shareholders.map((sh, i) => (
                         <tr
