@@ -144,7 +144,7 @@ const ShareholdersD3Chart: React.FC = () => {
   return (
     <svg
       ref={svgRef}
-      viewBox={`0 0 ${W} ${H}`}
+      viewBox={`40 0 ${W} ${H}`}
       className="sh-d3-svg"
       aria-label="최대주주 현황"
     />

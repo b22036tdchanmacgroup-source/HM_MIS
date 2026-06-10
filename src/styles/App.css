@@ -8604,3 +8604,432 @@ aside.side {
  background: linear-gradient(180deg, #e7f1ed 0%, #ffffff 100%) !important;
   z-index: 99;
 }
+
+/* ─── 주주 현황 상세 화면 (sh-detail-container) ─── */
+.sh-detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 2px 2px 10px;
+  box-sizing: border-box;
+}
+
+/* 툴바: 전체보기 버튼 */
+.sh-detail-toolbar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sh-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--brown-dark, #3e332c);
+  background: rgba(104, 78, 66, 0.08);
+  border: 1px solid rgba(104, 78, 66, 0.22);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sh-back-btn:hover {
+  background: rgba(104, 78, 66, 0.16);
+  border-color: rgba(104, 78, 66, 0.4);
+  transform: translateX(-2px);
+}
+
+.sh-back-btn .back-arrow {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* 상단 정보 카드 */
+.sh-detail-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #faf9f7;
+  border: 1px solid var(--border-light, #e5e2db);
+  border-radius: 12px;
+  padding: 14px 18px;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.sh-detail-company-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+}
+
+.sh-detail-logo {
+  height: 38px;
+  width: auto;
+  max-width: 90px;
+  object-fit: contain;
+}
+
+.sh-detail-logo-placeholder {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: white;
+}
+
+.sh-detail-name-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sh-detail-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.sh-detail-name {
+  font-size: 22px;
+  font-weight: 850;
+  color: var(--brown-dark, #3e332c);
+  letter-spacing: -0.02em;
+}
+
+.sh-detail-firm-type {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted, #7a756e);
+}
+
+.sh-detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: #5c554e;
+  flex-wrap: wrap;
+}
+
+.sh-detail-meta-row b {
+  font-weight: 700;
+  color: var(--brown-dark);
+}
+
+.sh-detail-meta-row .divider {
+  color: #dedad2;
+}
+
+/* 기업가치 박스 */
+.sh-detail-valuation-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: #ede9e4;
+  border: 1px solid #dedad2;
+  border-radius: 10px;
+  padding: 8px 16px;
+  min-width: 200px;
+}
+
+.sh-detail-valuation-box .val-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.sh-detail-valuation-box .val-amount {
+  font-size: 20px;
+  font-weight: 900;
+  color: #1a3226;
+}
+
+.sh-detail-valuation-box .val-date {
+  font-size: 10px;
+  color: #8a837b;
+  margin-top: 1px;
+}
+
+/* 중간: 주주 현황 구역 */
+.sh-detail-body-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sh-detail-chart-card {
+  background: #faf9f7;
+  border: 1px solid var(--border-light, #e5e2db);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.sh-detail-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brown-dark, #3e332c);
+  margin-bottom: 12px;
+  border-left: 3.5px solid var(--brown-dark);
+  padding-left: 8px;
+}
+
+.sh-detail-chart-content {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  min-height: 240px;
+}
+
+/* 파이 차트 */
+.sh-pie-chart-wrap {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-right: 1px dashed #ede9e4;
+  padding-right: 20px;
+}
+
+.sh-pie-chart {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.sh-pie-center {
+  width: 90px;
+  height: 90px;
+  background: #faf9f7;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.sh-pie-center .pie-label {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.sh-pie-center .pie-value {
+  font-size: 11.5px;
+  font-weight: 900;
+  color: var(--brown-dark);
+  margin-top: 1px;
+}
+
+.sh-pie-legend {
+  display: flex;
+  gap: 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.sh-pie-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sh-pie-legend .legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.sh-pie-legend .corp { color: #2845a0; }
+.sh-pie-legend .corp .legend-dot { background: #2845a0; }
+.sh-pie-legend .ind { color: #8c4a0e; }
+.sh-pie-legend .ind .legend-dot { background: #8c4a0e; }
+
+/* 주주 리스트 테이블 열 */
+.sh-sh-list-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-light, #e5e2db);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  min-height: 200px;
+}
+
+.sh-list-header {
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13.5px;
+}
+
+.sh-list-header.corp-bg { background: linear-gradient(135deg, #2845a0 0%, #1c337a 100%); }
+.sh-list-header.ind-bg { background: linear-gradient(135deg, #8c4a0e 0%, #6e3909 100%); }
+
+.sh-list-header-total {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.sh-list-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 180px;
+  scrollbar-width: thin;
+}
+
+.sh-sh-detail-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(104,78,66,0.08);
+  align-items: center;
+  font-size: 13px;
+  gap: 12px;
+}
+
+.sh-sh-detail-row:last-child {
+  border-bottom: none;
+}
+
+.sh-detail-row-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-detail-row-name.font-corp { color: #2845a0; }
+.sh-detail-row-name.font-ind { color: #8c4a0e; }
+
+.sh-detail-row-shares {
+  font-weight: 600;
+  color: var(--brown-dark);
+  text-align: right;
+  min-width: 80px;
+}
+
+.sh-detail-row-pct {
+  font-weight: 800;
+  color: #1a1a1a;
+  text-align: right;
+  min-width: 50px;
+}
+
+.sh-detail-row-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12.5px;
+}
+
+/* 비상장주식 평가 요약 테이블 카드 */
+.sh-detail-valuation-table-card {
+  background: #faf9f7;
+  border: 1px solid var(--border-light, #e5e2db);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.sh-valuation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: center;
+}
+
+.sh-valuation-table th {
+  background: #ede9e4;
+  color: var(--brown-dark);
+  font-weight: 800;
+  padding: 8px 10px;
+  border: 1px solid #dedad2;
+}
+
+.sh-valuation-table td {
+  padding: 10px;
+  border: 1px solid #dedad2;
+  color: #4a443e;
+  font-weight: 600;
+  background: #fff;
+}
+
+.sh-valuation-table td.highlight-text {
+  font-weight: 800;
+  color: #1a3226;
+}
+
+/* 최하단 스탯 카드 행 */
+.sh-detail-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.sh-stat-card {
+  display: flex;
+  align-items: center;
+  background: #faf9f7;
+  border: 1px solid var(--border-light, #e5e2db);
+  border-radius: 12px;
+  padding: 12px 16px;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.sh-stat-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(104, 78, 66, 0.1);
+  color: var(--brown-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sh-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sh-stat-label {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.sh-stat-val {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--brown-dark);
+  margin-top: 1px;
+}

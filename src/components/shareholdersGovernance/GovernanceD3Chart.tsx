@@ -373,7 +373,7 @@ const GovernanceD3Chart: React.FC<GovernanceD3ChartProps> = ({ onNodeHover, onNo
       <div className="gov-d3-toggle">
         <span className="sh-chart-title-label">2. 지배구조</span>
       </div>
-      <svg ref={svgRef} viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="gov-d3-svg" aria-label="지배구조도" />
+      <svg ref={svgRef} viewBox={`40 0 ${SVG_W} ${SVG_H}`} className="gov-d3-svg" aria-label="지배구조도" />
     </div>
   );
 };
