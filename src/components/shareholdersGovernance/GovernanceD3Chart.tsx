@@ -13,6 +13,7 @@ export interface GovD3HoverInfo {
 
 interface GovernanceD3ChartProps {
   onNodeHover?: (info: GovD3HoverInfo | null) => void;
+  onNodeClick?: (nodeId: string | null) => void;
 }
 
 const SVG_W = 1106;
@@ -54,10 +55,13 @@ function nodeTransform(d: GovD3Node, scale = 1): string {
   return `translate(${d.x},${d.y}) translate(${cx},${cy}) scale(${scale}) translate(${-cx},${-cy})`;
 }
 
-const GovernanceD3Chart: React.FC<GovernanceD3ChartProps> = ({ onNodeHover }) => {
+const GovernanceD3Chart: React.FC<GovernanceD3ChartProps> = ({ onNodeHover, onNodeClick }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const onNodeHoverRef = useRef(onNodeHover);
+  const onNodeClickRef = useRef(onNodeClick);
+  const selectedRef = useRef<string | null>(null);
   useEffect(() => { onNodeHoverRef.current = onNodeHover; });
+  useEffect(() => { onNodeClickRef.current = onNodeClick; });
 
   const draw = useCallback((svg: d3.Selection<SVGSVGElement, unknown, null, undefined>) => {
     const dataset = GOV_D3_CURRENT;
@@ -298,14 +302,17 @@ const GovernanceD3Chart: React.FC<GovernanceD3ChartProps> = ({ onNodeHover }) =>
         });
       })
       .on('mouseleave', () => {
-        nodes.transition('hover').duration(150)
-          .attr('opacity', 1)
-          .attr('transform', d => nodeTransform(d, 1));
+        const selId = selectedRef.current;
         nodes.each(function(d) {
+          const isSel = d.id === selId;
+          d3.select(this)
+            .transition('hover').duration(150)
+            .attr('opacity', selId && !isSel ? 0.5 : 1)
+            .attr('transform', nodeTransform(d, 1));
           d3.select(this).select<SVGPathElement>('path:not(.gov-nd-corner)').transition('hover').duration(150)
-            .attr('stroke-width', baseStrokeWidth(d))
-            .attr('fill', GOV_D3_STYLE[d.k]?.fill ?? '#fff')
-            .attr('filter', null);
+            .attr('stroke-width', isSel ? baseStrokeWidth(d) + 2.5 : baseStrokeWidth(d))
+            .attr('fill', isSel ? `url(#gov-hover-grad-${d.k})` : (GOV_D3_STYLE[d.k]?.fill ?? '#fff'))
+            .attr('filter', isSel ? 'url(#gov-nd-hover-shadow)' : null);
         });
         links.each(function(l) {
           d3.select(this).interrupt('hover').interrupt('hover-dash')
@@ -319,6 +326,41 @@ const GovernanceD3Chart: React.FC<GovernanceD3ChartProps> = ({ onNodeHover }) =>
         labels.transition('hover').duration(150).attr('opacity', 1);
         onNodeHoverRef.current?.(null);
       });
+
+    // ── 클릭: 노드 선택 / 재클릭 해제 ──────────────
+    nodes.on('click', function(event, n) {
+      (event as MouseEvent).stopPropagation();
+      const prev = selectedRef.current;
+      const next = prev === n.id ? null : n.id;
+      selectedRef.current = next;
+      onNodeClickRef.current?.(next);
+      nodes.each(function(d) {
+        const isSel = d.id === next;
+        d3.select(this)
+          .transition('select').duration(180)
+          .attr('opacity', next === null ? 1 : (isSel ? 1 : 0.5));
+        d3.select(this).select<SVGPathElement>('path:not(.gov-nd-corner)')
+          .transition('select').duration(180)
+          .attr('stroke-width', isSel ? baseStrokeWidth(d) + 2.5 : baseStrokeWidth(d))
+          .attr('fill', isSel ? `url(#gov-hover-grad-${d.k})` : (GOV_D3_STYLE[d.k]?.fill ?? '#fff'))
+          .attr('filter', isSel ? 'url(#gov-nd-hover-shadow)' : null);
+      });
+    });
+
+    // ── SVG 배경 클릭 → 선택 해제 ──────────────────
+    svg.on('click', () => {
+      if (selectedRef.current === null) return;
+      selectedRef.current = null;
+      onNodeClickRef.current?.(null);
+      nodes.each(function(d) {
+        d3.select(this).transition('select').duration(180).attr('opacity', 1);
+        d3.select(this).select<SVGPathElement>('path:not(.gov-nd-corner)')
+          .transition('select').duration(180)
+          .attr('stroke-width', baseStrokeWidth(d))
+          .attr('fill', GOV_D3_STYLE[d.k]?.fill ?? '#fff')
+          .attr('filter', null);
+      });
+    });
   }, []);
 
   useEffect(() => {

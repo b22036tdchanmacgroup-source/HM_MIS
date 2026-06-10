@@ -1734,45 +1734,159 @@ body::-webkit-scrollbar,
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 12px 28px 14px;
-  gap: 10px;
+  padding: 10px 18px 12px;
+  gap: 8px;
 }
 
-
-.gov-right-body {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.gov-right-placeholder {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  background: #faf9f7;
-  background-image: radial-gradient(circle, rgba(104,78,66,0.1) 1px, transparent 1px);
-  background-size: 22px 22px;
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
-  overflow: hidden;
-}
-
-.gov-right-placeholder-inner {
-  flex: 1;
+/* ── 제목 + 가족사 규모 버튼 행 ── */
+.sh-panel-topbar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+  padding: 0 2px;
 }
 
-.gov-right-placeholder-text {
-  font-size: 13px;
-  color: var(--text-muted);
-  opacity: 0.55;
-  font-weight: 500;
+.gov-scale-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 13px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--brown-dark, #3e332c);
+  background: rgba(104, 78, 66, 0.08);
+  border: 1px solid rgba(104, 78, 66, 0.22);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.gov-scale-btn:hover {
+  background: rgba(104, 78, 66, 0.16);
+  border-color: rgba(104, 78, 66, 0.4);
+}
+
+.gov-scale-btn-icon {
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+/* ── 주주현황 카드 그리드 ── */
+.sh-table-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  overflow-y: auto;
+  padding-right: 2px;
+  align-content: start;
+}
+
+.sh-table-grid::-webkit-scrollbar { width: 4px; }
+.sh-table-grid::-webkit-scrollbar-track { background: transparent; }
+.sh-table-grid::-webkit-scrollbar-thumb { background: rgba(104,78,66,0.2); border-radius: 4px; }
+
+/* ── 회사 카드 ── */
+.sh-company-card {
+  background: #ffffff;
+  border: 1.5px solid var(--border-light, #e8e4de);
+  border-left: 3.5px solid var(--card-color, #aaa);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: opacity 0.2s, box-shadow 0.22s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.sh-company-card.active {
+  box-shadow: 0 0 0 1.5px var(--card-color, #aaa), 0 3px 14px rgba(0,0,0,0.11);
+  border-left-width: 4.5px;
+}
+
+.sh-company-card.dimmed {
+  opacity: 0.32;
+}
+
+.sh-card-header {
+  padding: 5px 8px 4px;
+  background: #f8f7f5;
+  border-bottom: 1px solid #ece9e4;
+}
+
+.sh-card-name {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--card-color, #444);
+  letter-spacing: -0.01em;
+}
+
+/* ── 주주 테이블 ── */
+.sh-card-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5px;
+}
+
+.sh-card-table tr {
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.sh-card-table tr:last-child {
+  border-bottom: none;
+}
+
+.sh-row-corp { background: rgba(42, 90, 160, 0.025); }
+.sh-row-ind  { background: rgba(163, 101, 30, 0.025); }
+
+.sh-td-name {
+  padding: 3px 5px 3px 8px;
+  color: #2c3a30;
+  font-weight: 600;
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sh-td-type {
+  padding: 3px 3px;
+  text-align: center;
+}
+
+.sh-td-pct {
+  padding: 3px 8px 3px 2px;
+  text-align: right;
+  font-weight: 700;
+  color: #2c3a30;
+  white-space: nowrap;
+  font-size: 10px;
+}
+
+/* ── 주주 유형 뱃지: 법인/개인 ── */
+.sh-type-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.01em;
+}
+
+.sh-type-badge.corp {
+  background: rgba(42, 90, 160, 0.1);
+  color: #2a5aa0;
+  border: 1px solid rgba(42, 90, 160, 0.25);
+}
+
+.sh-type-badge.ind {
+  background: rgba(163, 101, 30, 0.1);
+  color: #7a4a1a;
+  border: 1px solid rgba(163, 101, 30, 0.22);
 }
 
 /* ─── 왼쪽 패널 내 섹션 패딩 축소 ─── */
