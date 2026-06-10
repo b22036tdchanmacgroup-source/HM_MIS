@@ -124,9 +124,6 @@ const TeamOverlay: React.FC<TeamOverlayProps> = ({ onClose }) => {
                         className={`sh-sh-row ${sh.type === '법인' ? 'sh-row-corp' : 'sh-row-ind'}`}
                       >
                         <span className="sh-td-name">{sh.name}</span>
-                        <span className={`sh-type-badge ${sh.type === '법인' ? 'corp' : 'ind'}`}>
-                          {sh.type}
-                        </span>
                         <span className="sh-td-pct">{sh.pct}</span>
                       </div>
                     ))}
