@@ -1,0 +1,3159 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>한맥가족 MIS - 지배구조 및 최대주주 현황</title>
+  <link rel="icon" type="image/svg+xml" href="https://b22036tdchanmacgroup-source.github.io/HM_MISystem/favicon.svg" />
+  
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  
+  <!-- Live Original CSS -->
+  <link rel="stylesheet" href="https://b22036tdchanmacgroup-source.github.io/HM_MISystem/assets/index-Bzj6sEJ3.css" />
+  
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    /* Styling overrides to match the exact user-provided design */
+    :root {
+      /* Style Guide Color System */
+      --green-100: #DDF1EA;
+      --green-200: #C3E8D9;
+      --green-300: #A6E0C9;
+      --green-400: #74C8A7;
+      --green-500: #33A877;
+      --green-600: #008657;
+      --green-700: #006F48;
+      --green-800: #00623F;
+      --green-900: #00452D;
+
+      --brown-100: #F4E6D2;
+      --brown-200: #F0D9BF;
+      --brown-300: #EACBB0;
+      --brown-400: #D89A63;
+      --brown-500: #C56F2A;
+      --brown-600: #B05200;
+      --brown-700: #8E4300;
+      --brown-800: #743600;
+      --brown-900: #522600;
+
+      --k-100: #F5F5F5;
+      --k-200: #E5E5E5;
+      --k-300: #D4D4D4;
+      --k-400: #A3A3A3;
+      --k-500: #737373;
+      --k-600: #525252;
+      --k-700: #404040;
+      --k-800: #262626;
+      --k-900: #000000;
+
+      --bg-beige: #F0EDE6;
+      --card-white: #ffffff;
+      --border-light: var(--k-200);
+      --brown-dark: var(--brown-900);
+      --brown-main: var(--brown-800);
+      --red: #ff3b30;
+      --orange: #ff9f0a;
+      --yellow: #ffd60a;
+      --green: #2e7d32;
+      --blue: #1565c0;
+      --grey: #6d645e;
+      --text-main: var(--k-800);
+      --text-muted: var(--k-500);
+      
+      --navy: #2b3f87;
+      --purple: #6a3d9a;
+      --red-accent: #CF2120;
+      --steel: #5b87a8;
+      --orange-accent: #e08c1a;
+      --note-color: #a07f1f;
+      --del-color: #d8434f;
+      --gray-accent: #8a8f9a;
+      --black-accent: #1a1a1a;
+      --font-main: "Noto Sans CJK KR", "Noto Sans KR", "Noto Sans", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden !important;
+      background: var(--bg-beige);
+      color: var(--text-main);
+      font-family: var(--font-main);
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* 50/50 Layout */
+    .gov-two-panel {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 20px 20px 24px 20px;
+      gap: 20px;
+      box-sizing: border-box;
+      align-items: stretch;
+    }
+
+    /* Left Panel: SVG Charts */
+    .gov-left-panel {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border: none !important;
+      background: none !important;
+      padding: 0 !important;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    /* Right Panel: Grid of Cards */
+    .gov-right-panel {
+      flex: 1;
+      height: 100%;
+      margin-top: 0;
+      background-image: 
+        url('../images/Subtract.svg'),
+        url('../images/Rectangle 34625844.svg');
+      background-position: 
+        left top,
+        8px 0;
+      background-size: 
+        100% 100%,
+        510px 74px;
+      background-repeat: 
+        no-repeat,
+        no-repeat;
+      border: none;
+      padding: 58px 24px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .right-panel-header {
+      position: absolute;
+      top: 0;
+      left: 8px;
+      width: 510px;
+      height: 58px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 0 0 12px 30px;
+      box-sizing: border-box;
+      border-bottom: none !important;
+      margin-bottom: 0;
+    }
+
+    .right-panel-subheader {
+      position: absolute !important;
+      top: 32px !important;
+      right: 27px !important;
+      color: rgba(85, 85, 85, 0.80) !important;
+      text-align: right;
+      font-family: var(--font-main) !important;
+      font-size: 18px !important;
+      font-style: normal !important;
+      font-weight: normal !important;
+      line-height: normal !important;
+      letter-spacing: -0.72px !important;
+    }
+
+    .right-panel-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--brown-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .right-panel-btn {
+      border-radius: 20px 0 0 20px;
+      border: none;
+      background: url('../images/btn_bg.svg') no-repeat center / 100% 100%;
+      box-shadow: none;
+      color: #5C3D1F;
+      cursor: pointer;
+      padding: 5px 16px 5px 18px;
+      font-size: 18px !important;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 34px;
+      white-space: nowrap;
+      margin-right: 123px;
+      transition: opacity 0.15s;
+    }
+    .right-panel-btn:hover {
+      opacity: 0.85;
+    }
+
+    /* White Chart Containers */
+    .chart-container-card {
+      border-radius: 30px 30px 8px 8px;
+      border-top: 1px solid rgba(211, 230, 219, 0.00);
+      border-right: 1px solid rgba(211, 230, 219, 0.00);
+      border-left: 1px solid rgba(211, 230, 219, 0.00);
+      border-bottom: none;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) -4.37%, rgba(240, 237, 230, 0.70) 47.81%, rgba(255, 255, 255, 0.00) 100%);
+      position: relative;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(62, 51, 44, 0.02);
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .gov-left-panel .chart-container-card:first-child {
+      flex: 285;
+      min-height: 0;
+    }
+
+    .gov-left-panel .chart-container-card:last-child {
+      flex: 730;
+      min-height: 0;
+    }
+
+    /* Centered Green Trapezoid/Header Tab */
+    .chart-header-tab-container {
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      width: 430px;
+      height: 49px;
+      background: url('../images/brown_title_bg.svg') no-repeat center;
+      background-size: contain;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chart-header-tab-text {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--brown-dark);
+      white-space: nowrap;
+      margin-top: -6px; /* Offset text position to match center of SVG trapezoid shape */
+    }
+
+    .sh-chart-wrap, .gov-d3-canvas {
+      border: none !important;
+      background: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      overflow: visible !important;
+    }
+
+    .sh-chart-wrap {
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .gov-d3-canvas {
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    #sh-d3-svg, #gov-d3-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible !important;
+    }
+
+    /* Grid layout for company shareholder cards */
+    .sh-table-grid {
+      grid-template-columns: repeat(5, 1fr) !important;
+      grid-template-rows: auto auto !important;
+      gap: 10px !important;
+      overflow-y: auto !important;
+      display: grid !important;
+      flex: 1;
+      background: none !important;
+      padding: 0 4px 10px 0 !important;
+      margin-top: 8px !important;
+      min-height: 0;
+      box-sizing: border-box;
+    }
+
+    .sh-table-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sh-table-grid::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 3px;
+    }
+    .sh-table-grid::-webkit-scrollbar-thumb {
+      background: rgba(104, 78, 66, 0.2);
+      border-radius: 3px;
+    }
+    .sh-table-grid::-webkit-scrollbar-thumb:hover {
+      background: rgba(104, 78, 66, 0.4);
+    }
+
+    .sh-company-card {
+      background-color: transparent !important;
+      border: 4px solid transparent;
+      border-radius: 4px 4px 10px 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: none !important;
+      transition: border-color 0.22s ease, background 0.22s ease, box-shadow 0.22s ease, border-radius 0.22s ease;
+      cursor: pointer;
+      align-self: start;
+    }
+
+
+    .sh-company-card:hover {
+      border-radius: 8px !important;
+      border: 4px solid var(--card-color, #aaa) !important;
+      background: #FFF !important;
+      mix-blend-mode: multiply;
+    }
+
+    .sh-company-card.active {
+      border-radius: 8px !important;
+      border: 4px solid var(--card-color, #aaa) !important;
+      background: #FFF !important;
+      mix-blend-mode: multiply;
+    }
+
+    .sh-company-card.dimmed {
+      /* dimmed effect removed */
+    }
+
+    .sh-card-header {
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--card-color, #888) 12%, transparent) 0%, color-mix(in srgb, var(--card-color, #888) 0%, transparent) 100%);
+      background-blend-mode: darken;
+      border-top: 0.1px solid var(--card-color) !important;
+      padding: 0 4px !important;
+      height: 36px !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px !important;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      color: #000 !important;
+      font-family: var(--font-main) !important;
+      font-size: 21px !important;
+      font-style: normal !important;
+      font-weight: 700 !important;
+      line-height: normal !important;
+      letter-spacing: -0.3px !important;
+    }
+
+    .sh-card-logo {
+      height: 18px;
+      max-width: 32px !important;
+      object-fit: contain;
+    }
+
+    .sh-card-logo-placeholder {
+      width: 18px;
+      height: 18px;
+      background: var(--card-color, #888);
+      color: #ffffff;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sh-card-name {
+      color: #000 !important;
+      font-family: var(--font-main) !important;
+      font-size: 20px !important;
+      font-style: normal !important;
+      font-weight: 700 !important;
+      line-height: normal !important;
+      letter-spacing: -0.3px !important;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .sh-card-body {
+      padding: 0;
+      flex: 1;
+      overflow: visible;
+    }
+
+    .sh-card-group-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sh-card-group-header {
+      display: grid;
+      grid-template-columns: 1fr 60px;
+      align-items: stretch;
+      font-size: 20px !important;
+      font-weight: 800;
+      border-bottom: 1.2px dotted var(--k-300);
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .sh-card-group-header > span:first-child {
+      padding: 0 4px !important;
+      display: flex;
+      align-items: center;
+    }
+
+    .sh-card-group-header > span:last-child {
+      padding: 0 0px !important;
+      text-align: right;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .sh-card-group-header.corp {
+      border-top: 0.7px solid #877243;
+      color: #836B35 !important;
+      background: #F1EDE6;
+      height: 38px !important;
+      font-weight: 700 !important;
+    }
+
+    .sh-card-group-header .sh-header-percent-symbol {
+      font-family: var(--font-main) !important;
+      font-size: 18px;
+      font-weight: 400 !important;
+    }
+
+    .sh-card-group-header.ind {
+      border-top: 0.7px solid #296B55;
+      color: var(--green-700);
+      background: #E8F0EC;
+      height: 38px !important;
+    }
+
+    .sh-sh-row {
+      display: grid;
+      grid-template-columns: 1fr 60px;
+      align-items: stretch;
+      padding: 0 !important;
+      border-bottom: 1.2px dotted var(--k-300);
+      font-size: 20px !important;
+      transition: background 0.1s;
+      height: 38px !important;
+      box-sizing: border-box;
+    }
+
+    .sh-company-card .sh-sh-row {
+      padding: 0 !important;
+    }
+
+    .sh-sh-row:hover {
+      background: rgba(104, 78, 66, 0.02);
+    }
+
+    .sh-sh-row:last-child {
+      border-bottom: none;
+    }
+
+    .sh-td-name {
+      font-weight: 700;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      color: #333;
+      font-size: 18px !important;
+      letter-spacing: -0.3px !important;
+    }
+
+    .sh-td-pct {
+      font-weight: 800;
+      text-align: right;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .sh-row-corp {
+      background: none !important;
+      background-color: transparent !important;
+    }
+
+    .sh-row-corp .sh-td-name {
+      color: #333 !important;
+      font-weight: normal !important;
+    }
+
+    .sh-row-corp .sh-td-pct {
+      color: #897445 !important;
+      background: none;
+      font-family: var(--font-main) !important;
+      font-size: 20px !important;
+      font-style: normal !important;
+      font-weight: 500 !important;
+      line-height: normal !important;
+      letter-spacing: -0.8px !important;
+    }
+
+    .sh-card-group-header.corp + .sh-row-corp .sh-td-pct {
+      background: linear-gradient(180deg, rgba(232, 225, 209, 0.50) 0%, rgba(232, 225, 209, 0.00) 100%);
+      mix-blend-mode: multiply;
+    }
+
+    .sh-row-ind {
+      background: none !important;
+      background-color: transparent !important;
+    }
+
+    .sh-row-ind .sh-td-name {
+      color: #333 !important;
+      font-weight: normal !important;
+    }
+
+    .sh-row-ind .sh-td-pct {
+      color: var(--green-700);
+      background: none;
+      font-family: var(--font-main) !important;
+      font-size: 20px !important;
+      font-style: normal !important;
+      font-weight: 500 !important;
+      line-height: normal !important;
+      letter-spacing: -0.8px !important;
+    }
+
+    .sh-card-group-header.ind + .sh-row-ind .sh-td-pct {
+      background: linear-gradient(180deg, rgba(197, 221, 210, 0.50) 0%, rgba(255, 255, 255, 0.00) 100%);
+      background-blend-mode: darken;
+      mix-blend-mode: darken;
+    }
+
+    /* D3 interactions */
+    .gov-nd {
+      cursor: pointer;
+    }
+
+    .gov-d3-edge {
+      transition: stroke-dashoffset 0.15s, stroke-width 0.15s, opacity 0.15s;
+    }
+
+    /* Data Editor Panel */
+    .editor-section {
+      margin: 16px;
+      background: var(--card-white);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 16px 24px;
+      box-shadow: 0 4px 12px rgba(62, 51, 44, 0.03);
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .editor-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--brown-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .editor-toggle-btn {
+      background: none;
+      border: none;
+      color: var(--brown-main);
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .editor-body {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .editor-body.open {
+      display: flex;
+    }
+
+    textarea {
+      width: 100%;
+      height: 250px;
+      font-family: var(--font-main);
+      font-size: 11.5px;
+      padding: 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      background: #fafaf9;
+      color: #333;
+      resize: vertical;
+    }
+
+    .editor-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--brown-dark);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background: #faf9f7;
+      color: var(--brown-dark);
+      border: 1px solid var(--border-light);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--brown-dark);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Header Styles */
+    .mis-header {
+      z-index: 100;
+      background: linear-gradient(#37a184 0%, #29724f 20%, #07412e 100%);
+      border-bottom: 1px solid #135643;
+      justify-content: space-between;
+      align-items: center;
+      height: 48px;
+      min-height: 48px;
+      padding: 0 22px 0 20px;
+      display: flex;
+      position: relative;
+      box-shadow: 0 2px 10px #0003;
+      color: #ffffff;
+      font-family: inherit;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      margin-right: 4px;
+    }
+
+    .header-icon-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .header-icon-circle:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .header-icon-circle.active {
+      border-color: rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-status-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 4px;
+    }
+
+    .header-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-tab-btn {
+      height: 28px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .header-tab-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    
+    <!-- 50/50 Dual Panel Layout -->
+    <div class="gov-two-panel">
+      
+      <!-- Left Column (D3 SVG Charts Stacked) -->
+      <div class="gov-left-panel">
+        
+        <!-- Top: 최대주주 현황 -->
+        <div class="chart-container-card">
+          <div class="chart-header-tab-container">
+            <div class="chart-header-tab-text">최대주주 현황</div>
+          </div>
+          <div class="sh-chart-wrap">
+            <svg id="sh-d3-svg" viewBox="0 0 1172 285"></svg>
+          </div>
+        </div>
+
+        <!-- Bottom: 지배구조 모식도 -->
+        <div class="chart-container-card">
+          <div class="chart-header-tab-container">
+            <div class="chart-header-tab-text">지배구조 모식도</div>
+          </div>
+          <div class="gov-d3-canvas">
+            <svg id="gov-d3-svg" viewBox="0 0 1172 730"></svg>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column (Company Shareholder Cards Grid) -->
+      <div class="gov-right-panel">
+        <div class="right-panel-header">
+          <div class="right-panel-title">가족사 주주 현황</div>
+          <button class="right-panel-btn" onclick="openDetailWindow('scale')">가족사 규모 ↗</button>
+        </div>
+        <div class="right-panel-subheader">
+          <span>(단위 : %)</span>
+        </div>
+        
+        <!-- Grid of 10 company shareholder cards -->
+        <div class="sh-table-grid" id="sh-cards-grid">
+          <!-- Dynamically populated company cards -->
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast-message">데이터가 실시간으로 적용되었습니다.</div>
+
+  <!-- Core Logic Script -->
+  <script>
+    // Asset base path for logos
+    const Zo = "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/";
+
+    // 1. Core Data Mappings (Editable)
+    const DEFAULT_DATA = {
+  "Qo": {
+    "navy": {
+      "fill": "#ffffff",
+      "stroke": "#2b3f87",
+      "sw": 2.2,
+      "dash": null
+    },
+    "purple": {
+      "fill": "#ffffff",
+      "stroke": "#6a3d9a",
+      "sw": 2.2,
+      "dash": null
+    },
+    "sky": {
+      "fill": "#ffffff",
+      "stroke": "#5aa7d6",
+      "sw": 2.2,
+      "dash": null
+    },
+    "skydash": {
+      "fill": "#ffffff",
+      "stroke": "#5aa7d6",
+      "sw": 2.2,
+      "dash": "8 5"
+    },
+    "black": {
+      "fill": "#ffffff",
+      "stroke": "#8B8B8B",
+      "sw": 2.2,
+      "dash": null
+    },
+    "non": {
+      "fill": "#ffffff",
+      "stroke": "#a8a795",
+      "sw": 2,
+      "dash": null
+    },
+    "red": {
+      "fill": "#ffffff",
+      "stroke": "#CF2120",
+      "sw": 2.2,
+      "dash": null
+    },
+    "amber": {
+      "fill": "#ffffff",
+      "stroke": "#e08c1a",
+      "sw": 2.2,
+      "dash": null
+    },
+    "del": {
+      "fill": "#fef2f2",
+      "stroke": "#dca0a0",
+      "sw": 2,
+      "dash": null
+    },
+    "slot": {
+      "fill": "none",
+      "stroke": "#a07f1f",
+      "sw": 2,
+      "dash": "8 5"
+    },
+    "note": {
+      "fill": "#ffffff",
+      "stroke": "#a07f1f",
+      "sw": 2.2,
+      "dash": "8 5"
+    },
+    "top": {
+      "fill": "#ffffff",
+      "stroke": "#1a1a1a",
+      "sw": 2.2,
+      "dash": null
+    },
+    "sh_baron": {
+      "fill": "#ffffff",
+      "stroke": "#8a8f9a",
+      "sw": 2.2,
+      "dash": null
+    },
+    "sh_child": {
+      "fill": "#ffffff",
+      "stroke": "#4273ae",
+      "sw": 2.2,
+      "dash": null
+    },
+    "sh_jp": {
+      "fill": "#ffffff",
+      "stroke": "rgba(66,115,174,0.8)",
+      "sw": 2.2,
+      "dash": null
+    }
+  },
+  "$o": {
+    "navy": "#2b3f87",
+    "purple": "#6a3d9a",
+    "red": "#CF2120",
+    "steel": "#5b87a8",
+    "orange": "#e08c1a",
+    "note": "#a07f1f",
+    "del": "#d8434f",
+    "gray": "#8a8f9a",
+    "black": "#1a1a1a"
+  },
+  "es": {
+    "title": "지배구조 — 현황",
+    "titleNote": "선 색 = 출자 주체 기준",
+    "badge": "상호출자 4건 · 비외감 5개사",
+    "badgeWarn": false,
+    "nodes": [
+      {
+        "id": "baron",
+        "name": "바론컨설턴트",
+        "sub": "비외감기업",
+        "k": "navy",
+        "x": 458,
+        "y": 40,
+        "w": 185,
+        "h": 78,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Baron.svg",
+        "lar": 1.674
+      },
+      {
+        "id": "ptc",
+        "name": "피티씨",
+        "sub": "비외감기업",
+        "k": "purple",
+        "x": 0,
+        "y": 220,
+        "w": 209,
+        "h": 83,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/PTC.svg",
+        "lar": 1
+      },
+      {
+        "id": "hanmaek",
+        "name": "한맥기술",
+        "sub": "외감기업",
+        "k": "red",
+        "x": 315,
+        "y": 220,
+        "w": 206,
+        "h": 83,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Hanmac.svg",
+        "lar": 1.647,
+        "lscale": 0.67
+      },
+      {
+        "id": "jp",
+        "name": "장헌파트너스",
+        "sub": "외감기업",
+        "k": "sky",
+        "x": 670,
+        "y": 220,
+        "w": 209,
+        "h": 85,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Jangheon.svg",
+        "lar": 2
+      },
+      {
+        "id": "open",
+        "name": "OPEN END",
+        "sub": "비외감기업",
+        "k": "non",
+        "x": 960,
+        "y": 220,
+        "w": 211,
+        "h": 83,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/open_end.png",
+        "lar": 1.5
+      },
+      {
+        "id": "saman",
+        "name": "삼안",
+        "sub": "외감기업",
+        "k": "amber",
+        "x": 670,
+        "y": 395,
+        "w": 206,
+        "h": 85,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Saman.svg",
+        "lar": 1
+      },
+      {
+        "id": "jhind",
+        "name": "장헌산업",
+        "sub": "외감기업",
+        "k": "sky",
+        "x": 960,
+        "y": 395,
+        "w": 211,
+        "h": 84,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Jangheon.svg",
+        "lar": 2
+      },
+      {
+        "id": "halla",
+        "name": "한라산업개발",
+        "sub": "외감기업",
+        "k": "non",
+        "x": 670,
+        "y": 530,
+        "w": 211,
+        "h": 83,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Halla.svg",
+        "lar": 3.803,
+        "lscale": 0.5
+      },
+      {
+        "id": "jh",
+        "name": "(주)장헌",
+        "sub": "비외감기업",
+        "k": "sky",
+        "x": 0,
+        "y": 395,
+        "w": 209,
+        "h": 85,
+        "logo": "jh.svg",
+        "lar": 1
+      },
+      {
+        "id": "hyunta",
+        "name": "현타",
+        "sub": "비외감기업",
+        "k": "black",
+        "x": 0,
+        "y": 620,
+        "w": 209,
+        "h": 83,
+        "logo": "Mask group.svg"
+      },
+      {
+        "id": "sanha",
+        "name": "산하종합기술",
+        "sub": "비외감기업",
+        "k": "black",
+        "x": 219,
+        "y": 620,
+        "w": 209,
+        "h": 83,
+        "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/shtnc.png",
+        "lar": 1
+      }
+    ],
+    "links": [
+      {
+        "s": "baron",
+        "t": "ptc",
+        "pct": "44.55%",
+        "c": "navy",
+        "d": "M550 118 V170 H105 V220",
+        "lx": 155,
+        "ly": 205
+      },
+      {
+        "s": "baron",
+        "t": "hanmaek",
+        "pct": "8.67%",
+        "c": "navy",
+        "d": "M550 118 V170 H418 V220",
+        "lx": 468,
+        "ly": 205
+      },
+      {
+        "s": "baron",
+        "t": "jp",
+        "pct": "9.60%",
+        "c": "navy",
+        "d": "M550 118 V170 H775 V220",
+        "lx": 825,
+        "ly": 205
+      },
+      {
+        "s": "baron",
+        "t": "saman",
+        "pct": "2.36%",
+        "c": "navy",
+        "d": "M643 79 H935 V438 H876",
+        "lx": 975,
+        "ly": 365
+      },
+      {
+        "s": "ptc",
+        "t": "hanmaek",
+        "pct": "9.86%",
+        "c": "purple",
+        "d": "M209 261 H315",
+        "lx": 260,
+        "ly": 251
+      },
+      {
+        "s": "hanmaek",
+        "t": "ptc",
+        "pct": "9.80%",
+        "c": "red",
+        "d": "M315 276 H209",
+        "lx": 250,
+        "ly": 306
+      },
+      {
+        "s": "jp",
+        "t": "hanmaek",
+        "pct": "9.81%",
+        "c": "steel",
+        "d": "M670 252 H521",
+        "lx": 595,
+        "ly": 242
+      },
+      {
+        "s": "hanmaek",
+        "t": "jp",
+        "pct": "9.60%",
+        "c": "red",
+        "d": "M521 276 H670",
+        "lx": 585,
+        "ly": 306
+      },
+      {
+        "s": "jp",
+        "t": "saman",
+        "pct": "65.39%",
+        "c": "steel",
+        "d": "M775 305 V395",
+        "lx": 812,
+        "ly": 365
+      },
+      {
+        "s": "ptc",
+        "t": "jp",
+        "pct": "9.73%",
+        "c": "purple",
+        "d": "M105 303 V330 H688 V305",
+        "lx": 585,
+        "ly": 365
+      },
+      {
+        "s": "hanmaek",
+        "t": "saman",
+        "pct": "25.21%",
+        "c": "red",
+        "d": "M418 303 V437 H670",
+        "lx": 575,
+        "ly": 466
+      },
+      {
+        "s": "saman",
+        "t": "halla",
+        "pct": "90.23%",
+        "c": "orange",
+        "d": "M773 480 V530",
+        "lx": 812,
+        "ly": 505
+      },
+      {
+        "s": "hanmaek",
+        "t": "halla",
+        "pct": "9.77%",
+        "c": "red",
+        "d": "M418 303 V571 H670",
+        "lx": 478,
+        "ly": 600
+      },
+      {
+        "s": "baron",
+        "t": "open",
+        "pct": "80.0%",
+        "c": "navy",
+        "d": "M550 118 V170 H1066 V220",
+        "lx": 1112,
+        "ly": 205
+      },
+      {
+        "s": "open",
+        "t": "jhind",
+        "pct": "100.0%",
+        "c": "gray",
+        "d": "M1066 303 V395",
+        "lx": 1110,
+        "ly": 365
+      },
+      {
+        "s": "ptc",
+        "t": "jh",
+        "pct": "100.0%",
+        "c": "purple",
+        "d": "M105 303 V395",
+        "lx": 148,
+        "ly": 365
+      }
+    ],
+    "annots": [],
+    "junctionArrows": [
+      {
+        "x": 550,
+        "y": 170,
+        "c": "navy"
+      }
+    ]
+  },
+  "ts": [
+    {
+      "id": "H",
+      "name": "주주1",
+      "sub": "최대주주",
+      "k": "top",
+      "x": 458,
+      "y": 6,
+      "w": 256,
+      "h": 66
+    },
+    {
+      "id": "baron",
+      "name": "바론컨설턴트",
+      "sub": "비외감기업",
+      "k": "sh_baron",
+      "x": 0,
+      "y": 135,
+      "w": 256,
+      "h": 66,
+      "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Baron.svg",
+      "lar": 1.674,
+      "lscale": 0.67
+    },
+    {
+      "id": "hanmaek",
+      "name": "한맥기술",
+      "sub": "외감기업",
+      "k": "sh_child",
+      "x": 305,
+      "y": 135,
+      "w": 256,
+      "h": 66,
+      "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Hanmac.svg",
+      "lar": 1.647,
+      "lscale": 0.67
+    },
+    {
+      "id": "jp",
+      "name": "장헌파트너스",
+      "sub": "외감기업",
+      "k": "sh_jp",
+      "x": 611,
+      "y": 135,
+      "w": 256,
+      "h": 66,
+      "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/Jangheon.svg",
+      "lar": 2,
+      "lscale": 0.625
+    },
+    {
+      "id": "ptc",
+      "name": "피티씨",
+      "sub": "비외감기업",
+      "k": "sh_child",
+      "x": 916,
+      "y": 135,
+      "w": 256,
+      "h": 66,
+      "logo": "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/images/logo/PTC.svg",
+      "lar": 1,
+      "lscale": 0.9
+    }
+  ],
+  "ns": [
+    {
+      "s": "H",
+      "t": "baron",
+      "pct": "70.00%",
+      "c": "gray",
+      "d": "M586 72 V91 H128 V131",
+      "lx": 10,
+      "ly": 132
+    },
+    {
+      "s": "H",
+      "t": "hanmaek",
+      "pct": "40.73%",
+      "c": "gray",
+      "d": "M586 72 V91 H433 V131",
+      "lx": 315,
+      "ly": 132
+    },
+    {
+      "s": "H",
+      "t": "jp",
+      "pct": "45.32%",
+      "c": "gray",
+      "d": "M586 72 V91 H739 V131",
+      "lx": 621,
+      "ly": 132
+    },
+    {
+      "s": "H",
+      "t": "ptc",
+      "pct": "38.10%",
+      "c": "gray",
+      "d": "M586 72 V91 H1044 V131",
+      "lx": 926,
+      "ly": 132
+    }
+  ],
+  "gs": [
+    {
+      "nodeId": "hanmaek",
+      "name": "한맥기술",
+      "k": "red",
+      "shareholders": [
+        {
+          "name": "주주1",
+          "type": "개인",
+          "pct": "40.73%"
+        },
+        {
+          "name": "한맥기술",
+          "type": "법인",
+          "pct": "11.45%",
+          "nodeId": "hanmaek"
+        },
+        {
+          "name": "피티씨",
+          "type": "법인",
+          "pct": "9.86%",
+          "nodeId": "ptc"
+        },
+        {
+          "name": "장헌파트너스",
+          "type": "법인",
+          "pct": "9.81%",
+          "nodeId": "jp"
+        },
+        {
+          "name": "바론컨설턴트",
+          "type": "법인",
+          "pct": "8.67%",
+          "nodeId": "baron"
+        },
+        {
+          "name": "주주2",
+          "type": "개인",
+          "pct": "6.64%"
+        },
+        {
+          "name": "주주3",
+          "type": "개인",
+          "pct": "5.31%"
+        },
+        {
+          "name": "주주4",
+          "type": "개인",
+          "pct": "4.09%"
+        },
+        {
+          "name": "주주5",
+          "type": "개인",
+          "pct": "3.44%"
+        }
+      ]
+    },
+    {
+      "nodeId": "saman",
+      "name": "삼안",
+      "k": "amber",
+      "shareholders": [
+        {
+          "name": "장헌파트너스",
+          "type": "법인",
+          "pct": "65.39%",
+          "nodeId": "jp"
+        },
+        {
+          "name": "한맥기술",
+          "type": "법인",
+          "pct": "25.21%",
+          "nodeId": "hanmaek"
+        },
+        {
+          "name": "농협은행",
+          "type": "법인",
+          "pct": "3.42%"
+        },
+        {
+          "name": "바론컨설턴트",
+          "type": "법인",
+          "pct": "2.36%",
+          "nodeId": "baron"
+        },
+        {
+          "name": "우리은행",
+          "type": "법인",
+          "pct": "2.09%"
+        },
+        {
+          "name": "기업은행",
+          "type": "법인",
+          "pct": "1.36%"
+        },
+        {
+          "name": "기타",
+          "type": "개인",
+          "pct": "0.16%"
+        }
+      ]
+    },
+    {
+      "nodeId": "jp",
+      "name": "장헌파트너스",
+      "k": "sky",
+      "shareholders": [
+        {
+          "name": "주주1",
+          "type": "개인",
+          "pct": "45.32%"
+        },
+        {
+          "name": "피티씨",
+          "type": "법인",
+          "pct": "9.73%",
+          "nodeId": "ptc"
+        },
+        {
+          "name": "한맥기술",
+          "type": "법인",
+          "pct": "9.60%",
+          "nodeId": "hanmaek"
+        },
+        {
+          "name": "바론컨설턴트",
+          "type": "법인",
+          "pct": "9.60%",
+          "nodeId": "baron"
+        },
+        {
+          "name": "주주2",
+          "type": "개인",
+          "pct": "7.47%"
+        },
+        {
+          "name": "주주3",
+          "type": "개인",
+          "pct": "4.60%"
+        },
+        {
+          "name": "주주4",
+          "type": "개인",
+          "pct": "3.88%"
+        },
+        {
+          "name": "주주5",
+          "type": "개인",
+          "pct": "3.30%"
+        },
+        {
+          "name": "주주6",
+          "type": "개인",
+          "pct": "2.45%"
+        },
+        {
+          "name": "주주7",
+          "type": "개인",
+          "pct": "2.45%"
+        },
+        {
+          "name": "주주8",
+          "type": "개인",
+          "pct": "1.60%"
+        }
+      ]
+    },
+    {
+      "nodeId": "jhind",
+      "name": "장헌산업",
+      "k": "sky",
+      "shareholders": [
+        {
+          "name": "장헌파트너스",
+          "type": "법인",
+          "pct": "100.00%",
+          "nodeId": "jp"
+        }
+      ]
+    },
+    {
+      "nodeId": "jh",
+      "name": "(주)장헌",
+      "k": "sky",
+      "shareholders": [
+        {
+          "name": "피티씨",
+          "type": "법인",
+          "pct": "100.00%",
+          "nodeId": "ptc"
+        }
+      ]
+    },
+    {
+      "nodeId": "ptc",
+      "name": "피티씨",
+      "k": "purple",
+      "shareholders": [
+        {
+          "name": "바론컨설턴트",
+          "type": "법인",
+          "pct": "44.55%",
+          "nodeId": "baron"
+        },
+        {
+          "name": "주주1",
+          "type": "개인",
+          "pct": "38.10%"
+        },
+        {
+          "name": "한맥기술",
+          "type": "법인",
+          "pct": "9.80%",
+          "nodeId": "hanmaek"
+        },
+        {
+          "name": "주주2",
+          "type": "개인",
+          "pct": "4.10%"
+        },
+        {
+          "name": "주주3",
+          "type": "개인",
+          "pct": "3.45%"
+        }
+      ]
+    },
+    {
+      "nodeId": "baron",
+      "name": "바론컨설턴트",
+      "k": "navy",
+      "shareholders": [
+        {
+          "name": "주주1",
+          "type": "개인",
+          "pct": "70.00%"
+        },
+        {
+          "name": "주주2",
+          "type": "개인",
+          "pct": "30.00%"
+        }
+      ]
+    },
+    {
+      "nodeId": "halla",
+      "name": "한라산업개발",
+      "k": "non",
+      "shareholders": [
+        {
+          "name": "삼안",
+          "type": "법인",
+          "pct": "90.23%",
+          "nodeId": "saman"
+        },
+        {
+          "name": "한맥기술",
+          "type": "법인",
+          "pct": "9.77%",
+          "nodeId": "hanmaek"
+        }
+      ]
+    },
+    {
+      "nodeId": "sanha",
+      "name": "산하종합기술",
+      "k": "non",
+      "shareholders": [
+        {
+          "name": "주주1",
+          "type": "개인",
+          "pct": "43.30%"
+        },
+        {
+          "name": "주주2",
+          "type": "개인",
+          "pct": "38.70%"
+        },
+        {
+          "name": "주주3",
+          "type": "개인",
+          "pct": "6.00%"
+        },
+        {
+          "name": "주주4",
+          "type": "개인",
+          "pct": "4.00%"
+        },
+        {
+          "name": "주주5",
+          "type": "개인",
+          "pct": "4.00%"
+        },
+        {
+          "name": "주주6",
+          "type": "개인",
+          "pct": "4.00%"
+        }
+      ]
+    },
+    {
+      "nodeId": "hyunta",
+      "name": "현타",
+      "k": "black",
+      "shareholders": [
+        {
+          "name": "주주1",
+          "type": "개인",
+          "pct": "100.00%"
+        }
+      ]
+    }
+  ],
+  "_s": {
+    "hanmaek": {
+      "estDate": "1996-05-03",
+      "industry": "토목엔지니어링",
+      "ceo": "김원근, 최영수",
+      "directors": "신현우, 신광수",
+      "employees": "393명",
+      "firmType": "외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "56,638 백만원",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "288,967원",
+      "totalSharesNum": "196,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "25.0%",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 9,
+      "corpShCount": "4명 (44.4%)",
+      "indShCount": "5명 (55.6%)",
+      "avgPct": "11.1%",
+      "bizType": "ENG. Business"
+    },
+    "saman": {
+      "estDate": "1967-12-30",
+      "industry": "토목엔지니어링",
+      "ceo": "최동식",
+      "directors": "이재만, 한종철",
+      "employees": "1,976명",
+      "firmType": "외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "127,125 백만원",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "212,304원",
+      "totalSharesNum": "598,789주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "20.0%",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 7,
+      "corpShCount": "6명 (85.7%)",
+      "indShCount": "1명 (14.3%)",
+      "avgPct": "14.3%",
+      "bizType": "ENG. Business"
+    },
+    "jp": {
+      "estDate": "2009-11-20",
+      "industry": "토목시공",
+      "ceo": "배문교",
+      "directors": "안병록, 강용석",
+      "employees": "(작성예정)",
+      "firmType": "외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "46,221 백만원",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "177,774원",
+      "totalSharesNum": "260,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "25.0%",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 11,
+      "corpShCount": "3명 (27.3%)",
+      "indShCount": "8명 (72.7%)",
+      "avgPct": "9.1%",
+      "bizType": "Manufacture & Construction"
+    },
+    "jhind": {
+      "estDate": "(작성예정)",
+      "industry": "제조",
+      "ceo": "장종찬",
+      "directors": "배문교, 정규민",
+      "employees": "(작성예정)",
+      "firmType": "외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "평가 전",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "평가 전",
+      "totalSharesNum": "260,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "—",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 1,
+      "corpShCount": "1명 (100.0%)",
+      "indShCount": "0명 (0.0%)",
+      "avgPct": "100.0%",
+      "bizType": "IT Business"
+    },
+    "jh": {
+      "estDate": "2009-11-16",
+      "industry": "토목시공",
+      "ceo": "안병록",
+      "directors": "배문교, 김기원",
+      "employees": "(작성예정)",
+      "firmType": "비외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "평가 전",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "평가 전",
+      "totalSharesNum": "190,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "—",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 1,
+      "corpShCount": "1명 (100.0%)",
+      "indShCount": "0명 (0.0%)",
+      "avgPct": "100.0%",
+      "bizType": "Manufacture & Construction"
+    },
+    "ptc": {
+      "estDate": "(작성예정)",
+      "industry": "토목시공",
+      "ceo": "김종도",
+      "directors": "박일규, 오창영",
+      "employees": "26명",
+      "firmType": "비외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "3,681 백만원",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "122,707원",
+      "totalSharesNum": "30,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "25.0%",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 5,
+      "corpShCount": "2명 (40.0%)",
+      "indShCount": "3명 (60.0%)",
+      "avgPct": "20.0%",
+      "bizType": "Manufacture & Construction"
+    },
+    "baron": {
+      "estDate": "2006-06-21",
+      "industry": "토목소프트웨어 개발, 공급",
+      "ceo": "장종찬",
+      "directors": "윤상근, 최인호",
+      "employees": "182명",
+      "firmType": "비외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "304 백만원",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "15,178원",
+      "totalSharesNum": "20,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "20.0%",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 2,
+      "corpShCount": "0명 (0.0%)",
+      "indShCount": "2명 (100.0%)",
+      "avgPct": "50.0%",
+      "bizType": "IT Business"
+    },
+    "halla": {
+      "estDate": "1999-04-09",
+      "industry": "전기·설비·환경·플랜트",
+      "ceo": "김원근, 최영수",
+      "directors": "박상혁, 서성오",
+      "employees": "222명",
+      "firmType": "외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "13,261 백만원",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "1,010원",
+      "totalSharesNum": "13,130,120주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "22.0%",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 2,
+      "corpShCount": "2명 (100.0%)",
+      "indShCount": "0명 (0.0%)",
+      "avgPct": "50.0%",
+      "bizType": "Environment EPC & Plant"
+    },
+    "sanha": {
+      "estDate": "(작성예정)",
+      "industry": "(작성예정)",
+      "ceo": "홍길동",
+      "directors": "김영희, 이철수",
+      "employees": "(작성예정)",
+      "firmType": "비외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "평가 전",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "평가 전",
+      "totalSharesNum": "100,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "—",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 6,
+      "corpShCount": "0명 (0.0%)",
+      "indShCount": "6명 (100.0%)",
+      "avgPct": "16.7%",
+      "bizType": "(작성예정)"
+    },
+    "hyunta": {
+      "estDate": "(작성예정)",
+      "industry": "(작성예정)",
+      "ceo": "김현타",
+      "directors": "박현타, 이현타",
+      "employees": "(작성예정)",
+      "firmType": "비외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "평가 전",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "평가 전",
+      "totalSharesNum": "60,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "—",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 1,
+      "corpShCount": "0명 (0.0%)",
+      "indShCount": "1명 (100.0%)",
+      "avgPct": "100.0%",
+      "bizType": "(작성예정)"
+    },
+    "open": {
+      "estDate": "2021-01-25",
+      "industry": "소프트웨어 개발업",
+      "ceo": "(작성예정)",
+      "employees": "(작성예정)",
+      "firmType": "비외감기업",
+      "marketCap": "(평가 예정)",
+      "prevMarketCap": "평가 전",
+      "pricePerShare": "(평가 예정)",
+      "prevPricePerShare": "평가 전",
+      "totalSharesNum": "10,000주",
+      "valuationDate": "2026.06.30",
+      "prevValuationDate": "2025.12.31",
+      "discountRate": "(평가 예정)",
+      "prevDiscountRate": "—",
+      "evalMethod": "(평가 예정)",
+      "totalShCount": 2,
+      "corpShCount": "1명 (50.0%)",
+      "indShCount": "1명 (50.0%)",
+      "avgPct": "50.0%",
+      "bizType": "IT Business"
+    }
+  }
+};
+
+    // Make local copy of data to work with
+    let DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
+
+    // Easing helper functions
+    function easeCubicOut(e) {
+      return --e * e * e + 1;
+    }
+    function easeCubicInOut(e) {
+      return ((e *= 2) <= 1 ? e * e * e : (e -= 2) * e * e + 2) / 2;
+    }
+
+    // Node scale & stroke helpers
+    const as = 1.02, os = 1.015, ss = 0.8;
+    function nee(node, hoveredId, connectedSet) {
+      return node.id === hoveredId ? as : connectedSet.has(node.id) ? os : 1;
+    }
+    function cs(node, hoveredId, connectedSet) {
+      let r = us(node);
+      return node.id === hoveredId ? r + 2 : connectedSet.has(node.id) ? r + ss : r;
+    }
+    function us(node) {
+      return DATA.Qo[node.k]?.sw ?? 2;
+    }
+    function ds(node, scaleVal = 1) {
+      if (scaleVal === 1) return `translate(${node.x},${node.y})`;
+      let n = node.w / 2, r = node.h / 2;
+      return `translate(${node.x},${node.y}) translate(${n},${r}) scale(${scaleVal}) translate(${-n},${-r})`;
+    }
+    function ls(hex, t) {
+      if (!hex.startsWith('#') || hex.length !== 7) return '#ffffff';
+      let n = parseInt(hex.slice(1, 3), 16),
+          r = parseInt(hex.slice(3, 5), 16),
+          i = parseInt(hex.slice(5, 7), 16),
+          a = val => Math.round(255 * (1 - t) + val * t).toString(16).padStart(2, '0');
+      return `#${a(n)}${a(r)}${a(i)}`;
+    }
+
+    function getLocalLogoPath(logoPath, nodeId) {
+      if (nodeId === 'hyunta') return '../images/Mask group.svg';
+      if (nodeId === 'jh') return '../images/jh.svg';
+      if (!logoPath) return '';
+      const parts = logoPath.split('/');
+      let filename = parts[parts.length - 1];
+      if (filename === 'jangheon_1.svg') {
+        filename = 'Jangheon.svg';
+      }
+      return '../images/' + filename;
+    }
+
+    // Active state
+    let selectedNodeId = null;
+
+    function openDetailWindow(nodeId) {
+      if (nodeId === 'H') return;
+      // Send message to parent React app to show content in dual panel
+      window.parent.postMessage({ type: 'govDetailRequest', nodeId: nodeId }, '*');
+    }
+
+    // Initialize page
+    window.addEventListener('DOMContentLoaded', () => {
+      // Render components
+      renderCompanyCardsGrid();
+      renderGovChart();
+      renderShChart();
+    });
+
+    // -------------------------------------------------------------
+    // D3 RENDER - Governance Structure Chart
+    // -------------------------------------------------------------
+    function renderGovChart() {
+      const svgEl = document.getElementById('gov-d3-svg');
+      const svg = d3.select(svgEl);
+      svg.selectAll('*').remove();
+      
+      const t = DATA.es;
+      const nodeMap = Object.fromEntries(t.nodes.map(n => [n.id, n]));
+      
+      // Defs (markers and filters)
+      const defs = svg.append('defs');
+      
+      Object.entries(DATA.$o).forEach(([key, color]) => {
+        defs.append('marker')
+          .attr('id', `gmk-${key}`)
+          .attr('markerWidth', 5)
+          .attr('markerHeight', 5)
+          .attr('refX', 4.5)
+          .attr('refY', 2.5)
+          .attr('orient', 'auto')
+          .append('path')
+          .attr('d', 'M0,0L5,2.5L0,5Z')
+          .attr('fill', color);
+      });
+
+      // Pct background gradients
+      Object.entries(DATA.$o).forEach(([key, color]) => {
+        let grad = defs.append('linearGradient')
+          .attr('id', `gov-pct-grad-${key}`)
+          .attr('x1', '100%')
+          .attr('y1', '0%')
+          .attr('x2', '0%')
+          .attr('y2', '0%');
+        grad.append('stop').attr('offset', '0%').attr('stop-color', color).attr('stop-opacity', 0);
+        grad.append('stop').attr('offset', '100%').attr('stop-color', color).attr('stop-opacity', 0.12);
+      });
+
+      // Hover shadow filter
+      defs.append('filter')
+        .attr('id', 'gov-nd-hover-shadow')
+        .attr('x', '-20%')
+        .attr('y', '-20%')
+        .attr('width', '140%')
+        .attr('height', '140%')
+        .append('feDropShadow')
+        .attr('dx', 0)
+        .attr('dy', 3)
+        .attr('stdDeviation', 5)
+        .attr('flood-opacity', 0.18);
+
+      const nodeBaseGrad = defs.append('linearGradient')
+        .attr('id', 'gov-node-base-grad')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '0%')
+        .attr('y2', '100%');
+      nodeBaseGrad.append('stop').attr('offset', '0%').attr('stop-color', '#FFF');
+      nodeBaseGrad.append('stop').attr('offset', '59.99%').attr('stop-color', '#FFF');
+      nodeBaseGrad.append('stop').attr('offset', '60%').attr('stop-color', '#F1F1F1');
+      nodeBaseGrad.append('stop').attr('offset', '100%').attr('stop-color', '#F1F1F1');
+
+      const nodeBaseNoSubGrad = defs.append('linearGradient')
+        .attr('id', 'gov-node-base-nosub-grad')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '0%')
+        .attr('y2', '100%');
+      nodeBaseNoSubGrad.append('stop').attr('offset', '0%').attr('stop-color', '#FFF');
+      nodeBaseNoSubGrad.append('stop').attr('offset', '56.73%').attr('stop-color', '#FFF');
+      nodeBaseNoSubGrad.append('stop').attr('offset', '100%').attr('stop-color', '#F1F1F1');
+
+      const nodeShadeGrad = defs.append('linearGradient')
+        .attr('id', 'gov-node-shade-grad')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '0%')
+        .attr('y2', '100%');
+      nodeShadeGrad.append('stop').attr('offset', '0%').attr('stop-color', '#ACACAC').attr('stop-opacity', 0.25);
+      nodeShadeGrad.append('stop').attr('offset', '24.04%').attr('stop-color', '#FFF').attr('stop-opacity', 0.5);
+      nodeShadeGrad.append('stop').attr('offset', '73.56%').attr('stop-color', '#FFF').attr('stop-opacity', 0.5);
+      nodeShadeGrad.append('stop').attr('offset', '100%').attr('stop-color', '#9F9F9F').attr('stop-opacity', 0.25);
+
+      const nodeShadeGradBlack = defs.append('linearGradient')
+        .attr('id', 'gov-node-shade-grad-black')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '0%')
+        .attr('y2', '100%');
+      nodeShadeGradBlack.append('stop').attr('offset', '0%').attr('stop-color', '#9F9F9F').attr('stop-opacity', 0.25);
+      nodeShadeGradBlack.append('stop').attr('offset', '10%').attr('stop-color', '#FFF').attr('stop-opacity', 0.5);
+      nodeShadeGradBlack.append('stop').attr('offset', '86.88%').attr('stop-color', '#FFF').attr('stop-opacity', 0.5);
+      nodeShadeGradBlack.append('stop').attr('offset', '100%').attr('stop-color', '#9F9F9F').attr('stop-opacity', 0.25);
+
+      const nodeShadow = defs.append('filter')
+        .attr('id', 'gov-node-shadow')
+        .attr('x', '-10%')
+        .attr('y', '-10%')
+        .attr('width', '120%')
+        .attr('height', '130%');
+      nodeShadow.append('feDropShadow')
+        .attr('dx', 0)
+        .attr('dy', 1.6)
+        .attr('stdDeviation', 1.6)
+        .attr('flood-color', '#000')
+        .attr('flood-opacity', 0.5);
+
+      // Light hover gradients for nodes
+      Object.entries(DATA.Qo).forEach(([key, val]) => {
+        let strokeColor = val?.stroke;
+        if (!strokeColor || strokeColor === 'none') return;
+        
+        let grad = defs.append('linearGradient')
+          .attr('id', `gov-hover-grad-${key}`)
+          .attr('x1', 0)
+          .attr('y1', 0)
+          .attr('x2', 0)
+          .attr('y2', 1)
+          .attr('gradientUnits', 'objectBoundingBox');
+          
+        grad.append('stop').attr('offset', '0%').attr('stop-color', '#ffffff');
+        grad.append('stop').attr('offset', '45%').attr('stop-color', '#ffffff');
+        grad.append('stop').attr('offset', '65%').attr('stop-color', ls(strokeColor, 0.06));
+        grad.append('stop').attr('offset', '82%').attr('stop-color', ls(strokeColor, 0.12));
+        grad.append('stop').attr('offset', '100%').attr('stop-color', ls(strokeColor, 0.2));
+      });
+
+      const containerGroup = svg.append('g').attr('transform', 'translate(0, 20)');
+
+      // Draw junction arrows
+      if (t.junctionArrows) {
+        t.junctionArrows.forEach(arrow => {
+          containerGroup.append('path')
+            .attr('d', `M${arrow.x},${arrow.y}v5`)
+            .attr('stroke', DATA.$o[arrow.c] || '#888')
+            .attr('stroke-width', 2)
+            .attr('marker-end', `url(#gmk-${arrow.c})`);
+        });
+      }
+
+      // Draw background glow paths for hover outline
+      const edgeGlows = containerGroup.append('g')
+        .attr('fill', 'none')
+        .selectAll('path')
+        .data(t.links)
+        .join('path')
+        .attr('class', 'gov-d3-edge-glow')
+        .attr('data-s', d => d.s)
+        .attr('data-t', d => d.t)
+        .attr('d', d => d.d)
+        .attr('stroke', d => DATA.$o[d.c] ?? '#888')
+        .attr('stroke-width', 10)
+        .attr('stroke-linecap', 'round')
+        .attr('stroke-linejoin', 'round')
+        .attr('opacity', 0)
+        .style('pointer-events', 'none');
+
+      // Draw edges (links)
+      const edges = containerGroup.append('g')
+        .attr('fill', 'none')
+        .selectAll('path')
+        .data(t.links)
+        .join('path')
+        .attr('class', 'gov-d3-edge')
+        .attr('data-s', d => d.s)
+        .attr('data-t', d => d.t)
+        .attr('d', d => d.d)
+        .attr('stroke', d => DATA.$o[d.c] ?? '#888')
+        .attr('stroke-width', 2.2)
+        .attr('stroke-dasharray', d => d.dash ?? null)
+        .attr('stroke-linecap', 'round')
+        .attr('stroke-linejoin', 'round');
+
+      // Draw semi-circles at connection starting points
+      const edgeStarts = containerGroup.append('g')
+        .attr('class', 'gov-d3-edge-starts')
+        .selectAll('path')
+        .data(t.links)
+        .join('path')
+        .attr('class', 'gov-d3-edge-start')
+        .attr('data-s', d => d.s)
+        .attr('data-t', d => d.t)
+        .attr('d', d => {
+          const tokens = d.d.split(/[ ,]+/);
+          if (tokens.length < 3 || tokens[0] !== 'M') return null;
+          const cx = parseFloat(tokens[1]);
+          const cy = parseFloat(tokens[2]);
+          if (isNaN(cx) || isNaN(cy)) return null;
+          
+          let nextCmd = tokens[3];
+          let nextVal = parseFloat(tokens[4]);
+          let dir = 'down';
+          
+          if (nextCmd === 'V') {
+            dir = nextVal > cy ? 'down' : 'up';
+          } else if (nextCmd === 'H') {
+            dir = nextVal > cx ? 'right' : 'left';
+          } else if (nextCmd === 'L') {
+            let nextY = parseFloat(tokens[5]);
+            if (!isNaN(nextVal) && !isNaN(nextY)) {
+              if (Math.abs(nextY - cy) > Math.abs(nextVal - cx)) {
+                dir = nextY > cy ? 'down' : 'up';
+              } else {
+                dir = nextVal > cx ? 'right' : 'left';
+              }
+            }
+          }
+          
+          const r = 4.5;
+          if (dir === 'down') {
+            return `M ${cx - r},${cy} A ${r},${r} 0 0,0 ${cx + r},${cy} Z`;
+          } else if (dir === 'up') {
+            return `M ${cx - r},${cy} A ${r},${r} 0 0,1 ${cx + r},${cy} Z`;
+          } else if (dir === 'right') {
+            return `M ${cx},${cy - r} A ${r},${r} 0 0,1 ${cx},${cy + r} Z`;
+          } else {
+            return `M ${cx},${cy - r} A ${r},${r} 0 0,0 ${cx},${cy + r} Z`;
+          }
+        })
+        .attr('fill', d => DATA.$o[d.c] ?? '#888')
+        .style('pointer-events', 'none')
+        .attr('opacity', 0);
+
+      edgeStarts.transition('draw')
+        .delay(180)
+        .duration(650)
+        .attr('opacity', 1);
+
+      // Marching ants animation on load for links
+      edges.each(function(d) {
+        if (d.dash) {
+          d3.select(this).attr('marker-end', `url(#gmk-${d.c})`);
+          return;
+        }
+        let totalLen = this.getTotalLength();
+        d3.select(this)
+          .attr('stroke-dasharray', totalLen)
+          .attr('stroke-dashoffset', totalLen)
+          .transition('draw')
+          .delay(180)
+          .duration(650)
+          .ease(easeCubicInOut)
+          .attr('stroke-dashoffset', 0);
+
+        setTimeout(() => {
+          d3.select(this)
+            .attr('stroke-dashoffset', 0)
+            .attr('stroke-dasharray', d.dash ?? null)
+            .attr('marker-end', d.noArrow ? null : `url(#gmk-${d.c})`);
+        }, 830);
+      });
+
+      // Draw link text percentage background rects
+      containerGroup.append('g')
+        .selectAll('rect')
+        .data(t.links)
+        .join('rect')
+        .attr('x', d => d.lx - 45)
+        .attr('y', d => d.ly - 21)
+        .attr('width', 90)
+        .attr('height', 24)
+        .attr('fill', d => `url(#gov-pct-grad-${d.c})`)
+        .style('mix-blend-mode', 'multiply')
+        .attr('opacity', 0)
+        .transition('draw')
+        .delay(350)
+        .duration(300)
+        .attr('opacity', 1);
+
+      // Draw link text percentages
+      const linkTexts = containerGroup.append('g')
+        .selectAll('text')
+        .data(t.links)
+        .join('text')
+        .attr('x', d => d.lx)
+        .attr('y', d => d.ly)
+        .attr('font-family', '"Noto Sans CJK KR", "Noto Sans KR", "Noto Sans", sans-serif')
+        .attr('text-anchor', 'middle')
+        .attr('opacity', 0);
+
+      linkTexts.each(function(d) {
+        const text = d3.select(this);
+        const valStr = d.pct;
+        const numericPct = parseFloat(valStr);
+        const numPart = Number.isFinite(numericPct) ? numericPct.toFixed(1) : valStr.replace('%', '');
+        const pctPart = valStr.endsWith('%') ? '%' : '';
+        const textColor = DATA.$o[d.c] ?? '#0C367F';
+
+        // Number part
+        text.append('tspan')
+          .text(numPart)
+          .attr('fill', textColor)
+          .attr('font-size', '24px')
+          .attr('font-weight', '700')
+          .attr('letter-spacing', '-0.8px');
+
+        // Percent part
+        text.append('tspan')
+          .text(pctPart)
+          .attr('fill', textColor)
+          .attr('font-size', '24px')
+          .attr('font-weight', '500')
+          .attr('letter-spacing', '-0.72px')
+          .attr('dx', '0.5px');
+      });
+
+      linkTexts.transition('draw')
+        .delay(350)
+        .duration(300)
+        .attr('opacity', 1);
+
+      // Draw company nodes
+      const nodes = containerGroup.append('g')
+        .selectAll('g.gov-nd')
+        .data(t.nodes, d => d.id)
+        .join('g')
+        .attr('class', 'gov-nd')
+        .attr('data-id', d => d.id)
+        .attr('transform', d => `translate(${d.x},${d.y})`)
+        .attr('opacity', 0);
+
+      // Node background rect
+      nodes.append('path')
+        .attr('class', 'gov-nd-bg')
+        .attr('d', d => {
+          let w = d.w, h = d.h, r = 3;
+          return `M${r},0 H${w-r} Q${w},0 ${w},${r} V${h-r} Q${w},${h} ${w-r},${h} H${r} Q0,${h} 0,${h-r} V${r} Q0,0 ${r},0 Z`;
+        })
+        .attr('fill', d => d.sub === '외감기업' ? 'url(#gov-node-base-grad)' : 'url(#gov-node-base-nosub-grad)')
+        .attr('stroke', 'rgba(231, 231, 231, 0.50)')
+        .attr('stroke-width', 2)
+        .attr('filter', 'url(#gov-node-shadow)');
+
+      nodes.append('path')
+        .attr('class', 'gov-nd-bg-shade')
+        .attr('d', d => {
+          let w = d.w, h = d.h, r = 3;
+          return `M${r},0 H${w-r} Q${w},0 ${w},${r} V${h-r} Q${w},${h} ${w-r},${h} H${r} Q0,${h} 0,${h-r} V${r} Q0,0 ${r},0 Z`;
+        })
+        .attr('fill', d => ['hyunta', 'sanha'].includes(d.id) ? 'url(#gov-node-shade-grad-black)' : 'url(#gov-node-shade-grad)')
+        .style('mix-blend-mode', 'multiply')
+        .style('pointer-events', 'none');
+
+      // Inset border path removed as per user request
+
+      nodes.append('rect')
+        .attr('class', 'gov-nd-top-border')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', d => d.w)
+        .attr('height', d => ['hyunta', 'sanha'].includes(d.id) ? 1.5 : 3)
+        .attr('rx', 3)
+        .attr('fill', d => DATA.Qo[d.k]?.stroke ?? '#CF2120')
+        .style('pointer-events', 'none');
+
+      // Node text details
+      nodes.append('text')
+        .attr('class', 'gov-nd-name')
+        .attr('x', d => d.w / 2)
+        .attr('y', d => d.sub === '외감기업' ? d.h / 2 + 1 : d.h / 2 + 12)
+        .attr('text-anchor', 'middle')
+        .attr('font-weight', 800)
+        .attr('font-size', 24)
+        .attr('fill', '#2c3a30')
+        .style('pointer-events', 'none')
+        .text(d => d.name);
+
+      nodes.append('text')
+        .attr('class', 'gov-nd-sub')
+        .attr('x', d => d.w / 2)
+        .attr('y', d => d.h / 2 + 25)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', 15)
+        .attr('font-weight', 600)
+        .attr('fill', '#000')
+        .style('pointer-events', 'none')
+        .text(d => d.sub === '비외감기업' ? '' : d.sub ? `(${d.sub})` : '');
+
+      // Entry transitions
+      nodes.transition('draw')
+        .delay((d, i) => 150 + i * 45)
+        .duration(380)
+        .ease(easeCubicOut)
+        .attr('opacity', 1);
+
+      // Draw logos if font or load triggered
+      function drawLogos() {
+        nodes.each(function(d) {
+          const logoUrl = getLocalLogoPath(d.logo, d.id);
+          if (!logoUrl) return;
+          
+          const container = d3.select(this);
+          container.selectAll('image').remove();
+          
+          const textNode = container.select('text.gov-nd-name');
+          const node = textNode.node();
+          if (!node) return;
+
+          let textWidth = node.getComputedTextLength();
+          let wVal = textWidth > 2 ? textWidth : d.name.length * 24 * 0.9;
+          
+          let imgH = 24 * (d.lscale ?? 1);
+          let imgW = imgH * (d.lar ?? 1);
+          let limit = d.w - 22;
+
+          if (imgW + 5 + wVal > limit) {
+            let ratio = (limit - 5 - wVal) / imgW;
+            imgH = Math.max(10, imgH * ratio);
+            imgW = imgH * (d.lar ?? 1);
+          }
+
+          let startX = (d.w - (imgW + 5 + wVal)) / 2;
+          let centerY = d.sub === '외감기업' ? d.h / 2 + 1 : d.h / 2 + 12;
+
+          textNode.attr('text-anchor', 'start').attr('x', startX + imgW + 5);
+          
+          container.insert('image', 'text.gov-nd-name')
+            .attr('href', logoUrl)
+            .attr('x', startX)
+            .attr('y', centerY - 10 - imgH / 2)
+            .attr('width', imgW)
+            .attr('height', imgH)
+            .attr('preserveAspectRatio', 'xMidYMid meet')
+            .style('pointer-events', 'none');
+        });
+      }
+
+      // Render logos
+      setTimeout(drawLogos, 50);
+
+      // Node Interaction events
+      nodes.on('mouseenter', function(e, d) {
+        let outgoing = t.links.filter(l => l.s === d.id);
+        let incoming = t.links.filter(l => l.t === d.id);
+        let connectedSet = new Set([d.id, ...outgoing.map(l => l.t), ...incoming.map(l => l.s)]);
+        
+        d3.select(this).raise();
+        
+        // Node scaling
+        nodes.transition('hover').duration(120)
+          .attr('opacity', n => connectedSet.has(n.id) ? 1 : 0.4)
+          .attr('transform', n => ds(n, nee(n, d.id, connectedSet)));
+
+        nodes.each(function(n) {
+          const isHovered = n.id === d.id;
+          const container = d3.select(this);
+          container.select('path.gov-nd-bg')
+            .transition('hover').duration(120)
+            .attr('stroke', isHovered ? (DATA.Qo[n.k]?.stroke ?? '#CF2120') : 'rgba(231, 231, 231, 0.50)')
+            .attr('stroke-width', isHovered ? 4 : 2)
+            .attr('fill', n.sub === '외감기업' ? 'url(#gov-node-base-grad)' : 'url(#gov-node-base-nosub-grad)')
+            .attr('filter', isHovered ? 'url(#gov-nd-hover-shadow)' : 'url(#gov-node-shadow)');
+        });
+
+        // Edge animations on hover (Solid lines as per user request: '호버하면 점선으로 표현되는것을 실선으로 바꿔줘')
+        edges.each(function(edge) {
+          let belongs = edge.s === d.id || edge.t === d.id;
+          let sel = d3.select(this);
+          sel.interrupt('hover').interrupt('hover-dash');
+
+          if (belongs) {
+            let len = this.getTotalLength();
+            // Always draw forward (in the direction of the arrowhead)
+            sel.attr('stroke-dasharray', len)
+               .attr('stroke-dashoffset', len)
+               .attr('marker-end', null) // Hide final arrow marker initially
+               .attr('stroke-width', 2.8)
+               .attr('opacity', 1)
+               .transition('hover-dash').duration(400).ease(easeCubicOut)
+               .attr('stroke-dashoffset', 0)
+               .on('end', function() {
+                  sel.attr('stroke-dasharray', null)
+                     .attr('stroke-dashoffset', null);
+                  // Restore marker-end arrow when solid line drawing ends
+                  if (!edge.noArrow) sel.attr('marker-end', `url(#gmk-${edge.c})`);
+
+                  // Fade in background glow outline together with the arrow
+                  d3.selectAll('.gov-d3-edge-glow')
+                    .filter(eg => eg.s === edge.s && eg.t === edge.t)
+                    .transition('hover').duration(150)
+                    .attr('stroke', edge.s === 'baron' || edge.t === 'baron' ? '#B5E5FF' : (DATA.$o[edge.c] ?? '#888'))
+                    .attr('opacity', 0.15);
+               });
+          } else {
+            sel.transition('hover').duration(120)
+               .attr('opacity', 0.15)
+               .attr('stroke-width', 1.8);
+          }
+        });
+
+        // Background glow outline animations on hover (Initially hide active glows while solid line is drawing)
+        edgeGlows.each(function(edge) {
+          let belongs = edge.s === d.id || edge.t === d.id;
+          let sel = d3.select(this);
+          sel.interrupt('hover').interrupt('hover-dash');
+
+          if (belongs) {
+            sel.attr('opacity', 0);
+          } else {
+            sel.transition('hover').duration(120)
+               .attr('opacity', 0);
+          }
+        });
+
+        // Sync highlight connection starting point semi-circles
+        d3.selectAll('.gov-d3-edge-start')
+          .transition('hover').duration(120)
+          .attr('opacity', edge => (edge.s === d.id || edge.t === d.id) ? 1 : 0.15);
+
+        // Sync highlight corresponding right grid card
+        highlightCompanyCard(d.id);
+      });
+
+      nodes.on('mouseleave', function() {
+        // Restore ALL nodes to full opacity — selection only affects border, not dim
+        nodes.transition('hover').duration(150)
+          .attr('opacity', 1)
+          .attr('transform', n => ds(n, 1));
+
+        nodes.each(function(n) {
+          const isSelected = n.id === selectedNodeId;
+          const container = d3.select(this);
+          container.select('path.gov-nd-bg')
+            .transition('hover').duration(150)
+            .attr('stroke', isSelected ? (DATA.Qo[n.k]?.stroke ?? '#CF2120') : 'rgba(231, 231, 231, 0.50)')
+            .attr('stroke-width', isSelected ? 4 : 2)
+            .attr('fill', n.sub === '외감기업' ? 'url(#gov-node-base-grad)' : 'url(#gov-node-base-nosub-grad)')
+            .attr('filter', isSelected ? 'url(#gov-nd-hover-shadow)' : 'url(#gov-node-shadow)');
+        });
+
+        edges.each(function(edge) {
+          d3.select(this).interrupt('hover').interrupt('hover-dash')
+            .attr('stroke-dashoffset', null)
+            .attr('stroke-dasharray', edge.dash ?? null)
+            .attr('marker-end', edge.noArrow ? null : `url(#gmk-${edge.c})`)
+            .transition('hover').duration(200)
+            .attr('opacity', 1)
+            .attr('stroke-width', 2.2);
+        });
+
+        edgeGlows.each(function(edge) {
+          d3.select(this).interrupt('hover')
+            .transition('hover').duration(200)
+            .attr('stroke', DATA.$o[edge.c] ?? '#888')
+            .attr('opacity', 0);
+        });
+
+        d3.selectAll('.gov-d3-edge-start')
+          .transition('hover').duration(200)
+          .attr('opacity', 1);
+
+        // Restore card highlights based on selectedNodeId
+        clearCompanyCardHighlights();
+      });
+
+      nodes.on('click', function(e, d) {
+        e.stopPropagation();
+        if (selectedNodeId === d.id) {
+          selectedNodeId = null;
+          clearCompanyCardHighlights();
+        } else {
+          selectedNodeId = d.id;
+          highlightCompanyCard(d.id, true);
+          openDetailWindow(d.id);
+        }
+        
+        // Update node borders based on selection — all nodes remain at full opacity
+        nodes.each(function(n) {
+          let isClicked = n.id === selectedNodeId;
+          const container = d3.select(this);
+          container.transition('select').duration(180)
+            .attr('opacity', 1);
+
+          container.select('path.gov-nd-bg')
+            .transition('select').duration(180)
+            .attr('stroke', isClicked ? (DATA.Qo[n.k]?.stroke ?? '#CF2120') : 'rgba(231, 231, 231, 0.50)')
+            .attr('stroke-width', isClicked ? 4 : 2)
+            .attr('fill', n.sub === '외감기업' ? 'url(#gov-node-base-grad)' : 'url(#gov-node-base-nosub-grad)')
+            .attr('filter', isClicked ? 'url(#gov-nd-hover-shadow)' : 'url(#gov-node-shadow)');
+        });
+      });
+
+      // Clear selection on background click
+      svg.on('click', () => {
+        selectedNodeId = null;
+        clearCompanyCardHighlights();
+        
+        nodes.transition('select').duration(180)
+          .attr('opacity', 1);
+
+        nodes.each(function(n) {
+          const container = d3.select(this);
+          container.select('path.gov-nd-bg')
+            .transition('select').duration(180)
+            .attr('stroke', 'rgba(231, 231, 231, 0.50)')
+            .attr('stroke-width', 2)
+            .attr('fill', n.sub === '외감기업' ? 'url(#gov-node-base-grad)' : 'url(#gov-node-base-nosub-grad)')
+            .attr('filter', 'url(#gov-node-shadow)');
+
+        });
+      });
+    }
+
+    // -------------------------------------------------------------
+    // D3 RENDER - Shareholders Chart
+    // -------------------------------------------------------------
+    function renderShChart() {
+      const svgEl = document.getElementById('sh-d3-svg');
+      const svg = d3.select(svgEl);
+      svg.selectAll('*').remove();
+
+      const defs = svg.append('defs');
+
+      // Recreate markers
+      Object.entries(DATA.$o).forEach(([key, color]) => {
+        defs.append('marker')
+          .attr('id', `sh-hmk-${key}`)
+          .attr('markerWidth', 5)
+          .attr('markerHeight', 5)
+          .attr('refX', 4.5)
+          .attr('refY', 2.5)
+          .attr('orient', 'auto')
+          .append('path')
+          .attr('d', 'M0,0L5,2.5L0,5Z')
+          .attr('fill', color);
+      });
+
+      // Linear gradient for child borders
+      let childGrad = defs.append('linearGradient')
+        .attr('id', 'sh-child-border-grad')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '100%')
+        .attr('y2', '0%');
+      childGrad.append('stop').attr('offset', '0%').attr('stop-color', '#2aacaa');
+      childGrad.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(66, 115, 174, 0.8)');
+
+      // Pct background gradients
+      const pctColors = {
+        baron: '#E4E7EE',
+        hanmaek: '#FEEBEB',
+        jp: '#E8F4F8',
+        ptc: '#F5EEF8'
+      };
+
+      Object.entries(pctColors).forEach(([id, color]) => {
+        let grad = defs.append('linearGradient')
+          .attr('id', `sh-pct-grad-${id}`)
+          .attr('x1', '100%')
+          .attr('y1', '0%')
+          .attr('x2', '0%')
+          .attr('y2', '0%');
+        grad.append('stop').attr('offset', '0%').attr('stop-color', color).attr('stop-opacity', 0);
+        grad.append('stop').attr('offset', '100%').attr('stop-color', color).attr('stop-opacity', 1);
+      });
+
+      // Drop shadow for company nodes
+      const shNodeShadow = defs.append('filter')
+        .attr('id', 'sh-node-shadow')
+        .attr('x', '-15%')
+        .attr('y', '-15%')
+        .attr('width', '130%')
+        .attr('height', '140%');
+      shNodeShadow.append('feDropShadow')
+        .attr('dx', 0)
+        .attr('dy', 2)
+        .attr('stdDeviation', 2)
+        .attr('flood-color', '#000000')
+        .attr('flood-opacity', 0.50);
+
+      // Background gradient for company nodes
+      let shBgGrad = defs.append('linearGradient')
+        .attr('id', 'sh-node-bg-grad')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '0%')
+        .attr('y2', '100%');
+      shBgGrad.append('stop').attr('offset', '55%').attr('stop-color', '#FAF9F9');
+      shBgGrad.append('stop').attr('offset', '55%').attr('stop-color', '#FFFFFF');
+
+      const container = svg.append('g').attr('transform', 'translate(0, 48)');
+
+      // Draw paths
+      container.append('g')
+        .attr('fill', 'none')
+        .selectAll('path')
+        .data(DATA.ns)
+        .join('path')
+        .attr('d', d => d.d)
+        .attr('stroke', d => DATA.$o[d.c] ?? '#888')
+        .attr('stroke-width', 2)
+        .each(function(d) {
+          let totalLen = this.getTotalLength();
+          let element = this;
+          d3.select(this)
+            .attr('stroke-dasharray', totalLen)
+            .attr('stroke-dashoffset', totalLen)
+            .transition()
+            .delay(120)
+            .duration(550)
+            .ease(easeCubicInOut)
+            .attr('stroke-dashoffset', 0);
+
+          setTimeout(() => {
+            d3.select(element)
+              .attr('stroke-dashoffset', 0)
+              .attr('stroke-dasharray', null)
+              .attr('marker-end', `url(#sh-hmk-${d.c})`);
+          }, 720);
+        });
+
+      // Draw path text percentage background rects
+      container.append('g')
+        .selectAll('rect')
+        .data(DATA.ns)
+        .join('rect')
+        .attr('x', d => d.lx - 10)
+        .attr('y', d => d.ly - 21)
+        .attr('width', 90)
+        .attr('height', 24)
+        .attr('fill', d => `url(#sh-pct-grad-${d.t})`)
+        .style('mix-blend-mode', 'multiply')
+        .attr('opacity', 0)
+        .transition()
+        .delay(450)
+        .duration(350)
+        .attr('opacity', 1);
+
+      // Draw path text percentages
+      const textNodes = container.append('g')
+        .selectAll('text')
+        .data(DATA.ns)
+        .join('text')
+        .attr('x', d => d.lx)
+        .attr('y', d => d.ly)
+        .attr('font-family', '"Noto Sans CJK KR", "Noto Sans KR", "Noto Sans", sans-serif')
+        .attr('text-anchor', 'start')
+        .attr('opacity', 0);
+
+      textNodes.each(function(d) {
+        const text = d3.select(this);
+        const valStr = d.pct;
+        const numPart = parseFloat(valStr).toFixed(1);
+        const pctPart = '%';
+        const shLabelColors = {
+          baron: '#0C367F',
+          hanmaek: '#CF2120',
+          jp: '#4273ae',
+          ptc: '#6a3d9a'
+        };
+        const textColor = shLabelColors[d.t] ?? '#0C367F';
+
+        // Number part
+        text.append('tspan')
+          .text(numPart)
+          .attr('fill', textColor)
+          .attr('font-size', '24px')
+          .attr('font-weight', '700')
+          .attr('letter-spacing', '-0.8px');
+
+        // Percent part
+        text.append('tspan')
+          .text(pctPart)
+          .attr('fill', textColor)
+          .attr('font-size', '24px')
+          .attr('font-weight', '500')
+          .attr('letter-spacing', '-0.72px')
+          .attr('dx', '0.5px');
+      });
+
+      textNodes.transition()
+        .delay(450)
+        .duration(350)
+        .attr('opacity', 1);
+
+      // Draw nodes
+      const nodes = container.append('g')
+        .selectAll('g.sh-nd')
+        .data(DATA.ts, d => d.id)
+        .join('g')
+        .attr('class', 'sh-nd')
+        .attr('data-id', d => d.id)
+        .attr('transform', d => `translate(${d.x},${d.y})`)
+        .attr('opacity', 0);
+
+      // Override height to 90px for company nodes
+      nodes.each(d => {
+        if (d.id !== 'H') {
+          d.h = 90;
+        }
+      });
+
+      // Background for nodes
+      nodes.each(function(d) {
+        const container = d3.select(this);
+        if (d.id === 'H') {
+          container.append('image')
+            .attr('class', 'sh-nd-bg-img')
+            .attr('href', '../images/title_bg.svg')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', d.w)
+            .attr('height', d.h)
+            .attr('preserveAspectRatio', 'none')
+            .style('pointer-events', 'none');
+        } else {
+          let w = d.w, h = d.h, r = 4;
+          container.append('path')
+            .attr('class', 'sh-nd-bg')
+            .attr('d', `M0,0 H${w} V${h-r} Q${w},${h} ${w-r},${h} H${r} Q0,${h} 0,${h-r} Z`)
+            .attr('fill', 'url(#sh-node-bg-grad)')
+            .attr('stroke', 'none')
+            .attr('stroke-width', 0)
+            .attr('filter', 'url(#sh-node-shadow)');
+        }
+      });
+
+      nodes.append('text')
+        .attr('class', 'gov-nd-name')
+        .attr('x', d => d.w / 2)
+        .attr('y', d => d.id === 'H' ? (d.h / 2 + 6.5) : 77)
+        .attr('text-anchor', 'middle')
+        .attr('font-weight', 800)
+        .attr('font-size', 24)
+        .attr('fill', '#2c3a30')
+        .style('pointer-events', 'none')
+        .text(d => d.name);
+
+      // Top border for company nodes (d.id !== 'H')
+      const shCompanyColors = {
+        baron: '#2b3f87',   // Baron: navy
+        hanmaek: '#CF2120', // Hanmac: red
+        jp: '#5aa7d6',      // Jangheon: sky blue
+        ptc: '#6a3d9a'      // PTC: purple
+      };
+
+      nodes.each(function(d) {
+        if (d.id === 'H') return;
+        d3.select(this).append('rect')
+          .attr('class', 'sh-nd-top-border')
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('width', d.w)
+          .attr('height', 3)
+          .attr('fill', shCompanyColors[d.id] ?? '#8a8f9a')
+          .style('pointer-events', 'none');
+      });
+
+      // Entry animations
+      nodes.transition()
+        .delay((d, i) => 80 + i * 40)
+        .duration(320)
+        .ease(easeCubicOut)
+        .attr('opacity', 1);
+
+      // Draw node logo images
+      function drawShLogos() {
+        nodes.each(function(d) {
+          if (d.id === 'H') return; // 주주1 does not have a logo
+          
+          const logoUrl = getLocalLogoPath(d.logo, d.id);
+          if (!logoUrl) return;
+          
+          const container = d3.select(this);
+          container.selectAll('image').remove();
+
+          const textNode = container.select('text.gov-nd-name');
+          if (!textNode.node()) return;
+
+          // Base logo dimensions for vertical layout
+          let imgH = 39 * (d.lscale ?? 1);
+          let imgW = imgH * (d.lar ?? 1);
+
+          // Center logo horizontally and vertically inside the top 55% area (height 49.5px)
+          let logoX = (d.w - imgW) / 2;
+          let logoY = 26 - imgH / 2; // Center of top half is ~26px
+
+          // Center text horizontally inside the bottom 45% area (y = 49.5 to 90, center ~70px)
+          textNode.attr('text-anchor', 'middle')
+            .attr('x', d.w / 2)
+            .attr('y', 77); // Center of bottom half (~70px) + baseline adjustment (~7px)
+
+          container.insert('image', 'text.gov-nd-name')
+            .attr('href', logoUrl)
+            .attr('x', logoX)
+            .attr('y', logoY)
+            .attr('width', imgW)
+            .attr('height', imgH)
+            .attr('preserveAspectRatio', 'xMidYMid meet')
+            .style('pointer-events', 'none');
+        });
+      }
+
+      setTimeout(drawShLogos, 50);
+
+
+
+      // Sh Node hover/click sync (Disabled as per user request: '최대주주현황은 아무 효과가 없어야 하고')
+      nodes.on('click', function(e, d) {
+        e.stopPropagation();
+        if (d.id !== 'H') {
+          openDetailWindow(d.id);
+        }
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Render Shareholder Table Cards Grid View
+    // -------------------------------------------------------------
+    function renderCompanyCardsGrid() {
+      const grid = document.getElementById('sh-cards-grid');
+      grid.innerHTML = '';
+
+      DATA.gs.forEach(company => {
+        // Skip H (주주1)
+        if (company.nodeId === 'H') return;
+
+        const color = DATA.Qo[company.k]?.stroke || '#8a8f9a';
+        
+        const card = document.createElement('div');
+        card.className = 'sh-company-card';
+        card.style.setProperty('--card-color', color);
+        card.dataset.id = company.nodeId;
+
+        const nodeData = DATA.es.nodes.find(n => n.id === company.nodeId) || DATA.ts.find(n => n.id === company.nodeId);
+        const logoUrl = getLocalLogoPath(nodeData?.logo || '', company.nodeId);
+        const logoHtml = logoUrl
+          ? `<img src="${logoUrl}" class="sh-card-logo" onerror="this.outerHTML='<div class=&quot;sh-card-logo-placeholder&quot;>${company.name.slice(0, 1)}</div>'" />`
+          : `<div class="sh-card-logo-placeholder" style="background: ${color};">${company.name.slice(0, 1)}</div>`;
+
+        // Render corporate vs individual shareholders
+        let corpShs = company.shareholders.filter(s => s.type === '법인');
+        let indShs = company.shareholders.filter(s => s.type !== '법인');
+
+        let bodyHtml = '';
+
+        if (corpShs.length > 0) {
+          let totalCorpPct = corpShs.reduce((acc, s) => acc + parseFloat(s.pct), 0).toFixed(1);
+          bodyHtml += `
+            <div class="sh-card-group-section">
+              <div class="sh-card-group-header corp">
+                <span>법인</span>
+                <span>${totalCorpPct}<span class="sh-header-percent-symbol">%</span></span>
+              </div>
+          `;
+          corpShs.forEach(sh => {
+            let pctVal = parseFloat(sh.pct).toFixed(1);
+            bodyHtml += `
+              <div class="sh-sh-row sh-row-corp">
+                <span class="sh-td-name">${sh.name}</span>
+                <span class="sh-td-pct">${pctVal}</span>
+              </div>
+            `;
+          });
+          bodyHtml += '</div>';
+        }
+
+        if (indShs.length > 0) {
+          let totalIndPct = indShs.reduce((acc, s) => acc + parseFloat(s.pct), 0).toFixed(1);
+          bodyHtml += `
+            <div class="sh-card-group-section">
+              <div class="sh-card-group-header ind">
+                <span>개인</span>
+                <span>${totalIndPct}<span class="sh-header-percent-symbol">%</span></span>
+              </div>
+          `;
+          indShs.forEach(sh => {
+            let pctVal = parseFloat(sh.pct).toFixed(1);
+            bodyHtml += `
+              <div class="sh-sh-row sh-row-ind">
+                <span class="sh-td-name">${sh.name}</span>
+                <span class="sh-td-pct">${pctVal}</span>
+              </div>
+            `;
+          });
+          bodyHtml += '</div>';
+        }
+
+        card.innerHTML = `
+          <div class="sh-card-header">
+            ${logoHtml}
+            <span class="sh-card-name">${company.name}</span>
+          </div>
+          <div class="sh-card-body">
+            ${bodyHtml}
+          </div>
+        `;
+
+        // Hovering a card highlights the node in D3
+        card.onmouseenter = () => {
+          highlightD3Node(company.nodeId);
+          highlightCompanyCard(company.nodeId);
+        };
+
+        card.onmouseleave = () => {
+          clearD3Highlights();
+          clearCompanyCardHighlights();
+        };
+
+        card.onclick = (e) => {
+          e.stopPropagation();
+          if (selectedNodeId === company.nodeId) {
+            selectedNodeId = null;
+            clearCompanyCardHighlights();
+            clearD3Highlights();
+          } else {
+            selectedNodeId = company.nodeId;
+            highlightCompanyCard(company.nodeId, true);
+            clearD3Highlights();
+            openDetailWindow(company.nodeId);
+          }
+        };
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Helper: Highlight right grid card
+    function highlightCompanyCard(nodeId, persistent = false) {
+      document.querySelectorAll('.sh-company-card').forEach(card => {
+        if (card.dataset.id === nodeId) {
+          card.classList.add('active');
+          card.classList.remove('dimmed');
+          if (persistent) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        } else {
+          card.classList.remove('active');
+        }
+      });
+    }
+
+    function clearCompanyCardHighlights() {
+      if (selectedNodeId !== null) {
+        highlightCompanyCard(selectedNodeId);
+        return;
+      }
+      document.querySelectorAll('.sh-company-card').forEach(card => {
+        card.classList.remove('active');
+        card.classList.remove('dimmed');
+      });
+    }
+
+    // Helper: Highlight D3 SVG nodes
+    function highlightD3Node(nodeId) {
+      d3.selectAll('g.gov-nd').each(function(n) {
+        let isMatch = n.id === nodeId;
+        let isActive = isMatch || n.id === selectedNodeId;
+        const container = d3.select(this);
+        
+        container.transition('hover').duration(120)
+          .attr('opacity', isMatch || (selectedNodeId && n.id === selectedNodeId) ? 1 : 0.3)
+          .attr('transform', ds(n, isMatch ? 1.02 : 1));
+          
+        if (isMatch) {
+          container.raise();
+        }
+        
+        container.select('path.gov-nd-bg')
+          .transition('hover').duration(120)
+          .attr('stroke', isActive ? (DATA.Qo[n.k]?.stroke ?? '#CF2120') : 'rgba(231, 231, 231, 0.50)')
+          .attr('stroke-width', isActive ? 4 : 2)
+          .attr('fill', n.sub === '외감기업' ? 'url(#gov-node-base-grad)' : 'url(#gov-node-base-nosub-grad)')
+          .attr('filter', isActive ? 'url(#gov-nd-hover-shadow)' : 'url(#gov-node-shadow)');
+
+      });
+      
+      d3.selectAll('.gov-d3-edge').each(function(e) {
+        let belongs = e.s === nodeId || e.t === nodeId;
+        let sel = d3.select(this);
+        sel.interrupt('hover').interrupt('hover-dash');
+
+        if (belongs) {
+          let len = this.getTotalLength();
+          // Always draw forward (in the direction of the arrowhead)
+          sel.attr('stroke-dasharray', len)
+             .attr('stroke-dashoffset', len)
+             .attr('marker-end', null) // Hide final arrow marker initially
+             .attr('opacity', 1)
+             .attr('stroke-width', 2.8)
+             .transition('hover-dash').duration(400).ease(easeCubicOut)
+             .attr('stroke-dashoffset', 0)
+             .on('end', function() {
+                sel.attr('stroke-dasharray', null)
+                   .attr('stroke-dashoffset', null);
+                // Restore marker-end arrow when solid line drawing ends
+                if (!e.noArrow) sel.attr('marker-end', `url(#gmk-${e.c})`);
+
+                // Fade in background glow outline together with the arrow
+                d3.selectAll('.gov-d3-edge-glow')
+                  .filter(eg => eg.s === e.s && eg.t === e.t)
+                  .transition('hover').duration(150)
+                  .attr('stroke', e.s === 'baron' || e.t === 'baron' ? '#B5E5FF' : (DATA.$o[e.c] ?? '#888'))
+                  .attr('opacity', 0.15);
+             });
+        } else {
+          sel.transition('hover').duration(120)
+             .attr('opacity', 0.15)
+             .attr('stroke-width', 1.8)
+             .attr('stroke-dasharray', e.dash ?? null)
+             .attr('marker-end', e.noArrow ? null : `url(#gmk-${e.c})`);
+        }
+      });
+
+      d3.selectAll('.gov-d3-edge-glow').each(function(e) {
+        let belongs = e.s === nodeId || e.t === nodeId;
+        let sel = d3.select(this);
+        sel.interrupt('hover').interrupt('hover-dash');
+
+        if (belongs) {
+          sel.attr('opacity', 0);
+        } else {
+          sel.transition('hover').duration(120)
+             .attr('opacity', 0);
+        }
+      });
+
+      d3.selectAll('.gov-d3-edge-start')
+        .transition('hover').duration(120)
+        .attr('opacity', edge => (edge.s === nodeId || edge.t === nodeId) ? 1 : 0.15);
+    }
+
+    function clearD3Highlights() {
+      d3.selectAll('g.gov-nd').each(function(n) {
+        const isSelected = n.id === selectedNodeId;
+        const container = d3.select(this);
+        
+        // Always restore to full opacity — only border reflects selection
+        container.transition('hover').duration(150)
+          .attr('opacity', 1)
+          .attr('transform', ds(n, 1));
+          
+        container.select('path.gov-nd-bg')
+          .transition('hover').duration(150)
+          .attr('stroke', isSelected ? (DATA.Qo[n.k]?.stroke ?? '#CF2120') : 'rgba(231, 231, 231, 0.50)')
+          .attr('stroke-width', isSelected ? 4 : 2)
+          .attr('fill', n.sub === '외감기업' ? 'url(#gov-node-base-grad)' : 'url(#gov-node-base-nosub-grad)')
+          .attr('filter', isSelected ? 'url(#gov-nd-hover-shadow)' : 'url(#gov-node-shadow)');
+      });
+        
+      d3.selectAll('.gov-d3-edge').interrupt('hover').interrupt('hover-dash')
+        .attr('stroke-dashoffset', null)
+        .transition('hover').duration(150)
+        .attr('opacity', 1)
+        .attr('stroke-width', 2.2)
+        .attr('stroke-dasharray', e => e.dash ?? null)
+        .attr('marker-end', e => e.noArrow ? null : `url(#gmk-${e.c})`); // Restore arrow markers
+
+      d3.selectAll('.gov-d3-edge-glow').transition('hover').duration(150)
+        .attr('stroke', e => DATA.$o[e.c] ?? '#888')
+        .attr('opacity', 0);
+
+      d3.selectAll('.gov-d3-edge-start').transition('hover').duration(150)
+        .attr('opacity', 1);
+    }
+
+
+
+    function showToast(message) {
+      const toast = document.getElementById('toast-message');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>

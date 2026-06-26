@@ -1,0 +1,2059 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>가족사 상세 현황</title>
+  
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    :root {
+      --bg-beige: #F0EDE6;
+      --bg-light: #F7F5F0;
+      --card-white: #ffffff;
+      --border-color: #E2DFD8;
+      --text-dark: #1E1B18;
+      --text-muted: #7E7870;
+      --green-main: #33A877;
+      --brown-main: #897445;
+      --gold-gradient: linear-gradient(180deg, #F3EFE9 0%, #E6DFD3 100%);
+      --gold-border: #D8CEBE;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Noto Sans CJK KR", "Noto Sans KR", "Pretendard", sans-serif;
+      background: linear-gradient(108deg, #FFF 0%, #F0EDE6 100%);
+      color: var(--text-dark);
+      letter-spacing: -0.4px;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header Styles (hidden — header shown in parent detail-viewer window) */
+    aside.side {
+      display: none !important;
+      z-index: 100;
+      background: linear-gradient(#37a184 0%, #29724f 20%, #07412e 100%);
+      border-bottom: 1px solid #135643;
+      justify-content: space-between;
+      align-items: center;
+      height: 48px;
+      min-height: 48px;
+      padding: 0 22px 0 20px;
+      display: flex;
+      position: relative;
+      box-shadow: 0 2px 10px #0003;
+      color: #ffffff;
+      font-family: inherit;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      margin-right: 4px;
+    }
+
+    .header-icon-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .header-icon-circle:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .header-icon-circle.active {
+      border-color: rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-status-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 4px;
+    }
+
+    .header-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-tab-btn {
+      height: 28px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .header-tab-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .detail-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+    }
+
+    .top-region {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-items: stretch;
+      flex: 1;
+      min-height: 540px;
+    }
+
+    .top-right-content {
+      flex: 1;
+      padding: 20px 30px 20px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .bottom-region {
+      width: 100%;
+      padding: 20px 0 20px 0;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    /* -------------------------------------------------------------
+       Left Sidebar Panel
+       ------------------------------------------------------------- */
+    .sidebar {
+      position: relative;
+      width: 285px;
+      min-height: 540px;
+      background-color: transparent;
+      background-image: url('../images/company_bg02.svg');
+      background-repeat: no-repeat;
+      background-position: 0 0;
+      background-size: auto 100%;
+      border-right: none;
+      padding: 20px 28px 28px 28px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: visible;
+      margin:0 14px 0 0;
+    }
+
+    .sidebar-category {
+      position: relative;
+      z-index: 1;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .sidebar-logo-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: flex-start;
+      padding: 20px 0;
+    }
+
+    .sidebar-logo {
+      height: 90px;
+      max-width: 225px;
+      object-fit: contain;
+    }
+
+    .sidebar-logo-placeholder {
+      width: 60px;
+      height: 60px;
+      background: var(--text-muted);
+      color: #ffffff;
+      border-radius: 12px;
+      font-size: 28px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-title {
+      position: relative;
+      z-index: 1;
+      font-size: 32px;
+      font-weight: 800;
+      text-align: left;
+    }
+
+    .sidebar-subtitle {
+      position: relative;
+      z-index: 1;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-info-list {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      margin-top: auto;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-info-item {
+      display: flex;
+      align-items: baseline;
+      padding-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .sidebar-info-label {
+      color: var(--text-muted);
+      font-weight: 500;
+      min-width: 64px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-info-value {
+      font-weight: 700;
+      text-align: left;
+    }
+
+    /* -------------------------------------------------------------
+       Main Content Area
+       ------------------------------------------------------------- */
+    /* Main Content Area style renamed to .top-right-content and defined above */
+
+    /* Top Cards Row */
+    .top-cards-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-image: url('../images/Vector%203841%20(Stroke).svg');
+      background-position: bottom center;
+      background-repeat: no-repeat;
+      background-size: 100% 2px;
+      padding: 0 0 20px 0;
+    }
+
+    .metric-card {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      border: none;
+      background: none;
+      box-shadow: none;
+      border-radius: 0;
+      position: relative;
+    }
+
+    .metric-card:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 10%;
+      height: 80%;
+      width: 1px;
+      background-color: var(--border-color);
+    }
+
+    .metric-icon-wrap {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .metric-icon-img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .metric-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .metric-value {
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .metric-unit {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+
+    /* Middle Panels Row */
+    .middle-panels-row {
+      display: grid;
+      grid-template-columns: 4.7fr 3.3fr;
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .panel-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .panel-title {
+      font-size: 25px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Shareholder Status Content */
+    .sh-panel-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .sh-donut-section {
+      position: relative;
+      min-height: 162px;
+      padding: 0px 10% 8px;
+      flex-shrink: 0;
+    }
+
+    .donut-side-info {
+      --donut-icon-size: 84px;
+      --donut-label-offset: calc(var(--donut-icon-size) * 0.2);
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 0 0 auto;
+    }
+
+    .donut-side-info.corp-side {
+      position: absolute;
+      right: calc(50% + 127px);
+      top: 50%;
+      transform: translateY(-50%);
+      justify-content: flex-end;
+    }
+
+    .donut-side-info.ind-side {
+      position: absolute;
+      left: calc(50% + 127px);
+      top: 50%;
+      transform: translateY(-50%);
+      justify-content: flex-start;
+    }
+
+    .donut-side-icon {
+      width: var(--donut-icon-size);
+      height: var(--donut-icon-size);
+      object-fit: contain;
+      transform: translateY(-6px);
+    }
+
+    .donut-side-icon.corp-icon {
+      transform: translateX(-40px) translateY(-6px);
+    }
+
+    .donut-side-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .donut-side-details.text-right {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .donut-side-details:not(.text-right) {
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .donut-side-header {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 1px;
+    }
+
+    .donut-side-label {
+      position: absolute;
+      top: var(--donut-label-offset);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .donut-side-label.corp {
+      top: 0;
+      left: calc(var(--donut-icon-size) * 0.72 + 5px - 40px);
+      color: #743600;
+      text-shadow: -2px 2px 4px rgba(207, 174, 127, 0.45);
+      -webkit-text-stroke-width: 0.5px;
+      -webkit-text-stroke-color: #FFF;
+      font-family: Inter;
+      font-size: 22px;
+      font-style: normal;
+      font-weight: 900;
+      line-height: 140%;
+      letter-spacing: -0.88px;
+    }
+
+    .donut-side-label.ind {
+      top: 0;
+      right: calc(var(--donut-icon-size) * 0.72 + 5px);
+      transform: translateX(40px);
+      color: #007049;
+      text-shadow: 2px 2px 4px rgba(0, 138, 5, 0.15);
+      -webkit-text-stroke-width: 0.5px;
+      -webkit-text-stroke-color: #FFFCFC;
+      font-family: Inter;
+      font-size: 22px;
+      font-style: normal;
+      font-weight: 900;
+      line-height: 140%;
+      letter-spacing: -0.88px;
+    }
+
+    .donut-side-icon.ind-icon {
+      transform: translateX(40px) translateY(-6px);
+    }
+
+    .donut-side-pct {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+
+    .donut-side-pct.corp {
+      color: #B05200;
+    }
+
+    .donut-side-pct.ind {
+      color: #008657;
+    }
+
+    .donut-side-shares,
+    .donut-side-val {
+      font-weight: 700;
+      color: var(--text-dark);
+      text-align: right;
+    }
+
+    .donut-side-shares {
+      font-size: 28px;
+    }
+
+    .donut-side-val {
+      font-size: 18px;
+    }
+
+    .donut-chart-wrap {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 154px;
+      height: 154px;
+      z-index: 1;
+    }
+
+    .donut-chart-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      width:100%;
+    }
+
+    .donut-center-label {
+      font-size: 18px;
+      color: #090909;
+      font-weight: 500;
+      line-height: 0.9;
+      margin-bottom: 2px;
+      letter-spacing: -1px;
+      white-space: nowrap;
+    }
+
+    .donut-center-value {
+      font-size: 40px;
+      font-weight: 700;
+      color: #402D00;
+      line-height: 0.9;
+      letter-spacing: -1px;;
+    }
+
+    .metric-value,
+    .sidebar-info-value,
+    .donut-side-pct,
+    .donut-side-shares,
+    .donut-side-val,
+    .donut-center-value,
+    .sh-subtable tbody td:nth-child(n + 2),
+    .val-table td,
+    .total-card-value,
+    .holding-value {
+      letter-spacing: 0;
+    }
+
+    .sh-lists-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 7px 5px 5px 5px;
+      border: 1px solid #683501;
+      background: #FFF;
+    }
+
+    .sh-table-pane {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .sh-subtable tbody,
+    .val-table tbody {
+      display: block;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #8f8d89 #e4e1dc;
+    }
+
+    .sh-subtable tbody::-webkit-scrollbar,
+    .val-table tbody::-webkit-scrollbar {
+      width: 32px;
+    }
+
+    .sh-subtable tbody::-webkit-scrollbar-track,
+    .val-table tbody::-webkit-scrollbar-track {
+      background: #e4e1dc;
+      border-radius: 999px;
+    }
+
+    .sh-subtable tbody::-webkit-scrollbar-thumb,
+    .val-table tbody::-webkit-scrollbar-thumb {
+      background: #8f8d89;
+      border: 8px solid #e4e1dc;
+      border-radius: 999px;
+    }
+
+    .sh-subtable tbody::-webkit-scrollbar-button,
+    .val-table tbody::-webkit-scrollbar-button {
+      display: none;
+    }
+
+    .sh-table-pane:first-child {
+      border-right: 1px solid #ddd;
+    }
+
+    .sh-lists-frame {
+      display: flex;
+      flex: 1;
+      min-height: 226px;
+      overflow: hidden;
+      padding: 4px;
+      border-radius: 11px 9px 9px 9px;
+      background: #E8E1D0;
+    }
+
+    .sh-subtable {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 18px;
+    }
+
+    .sh-subtable thead,
+    .sh-subtable tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .sh-subtable-header {
+      font-weight: 500;
+      color: var(--text-muted);
+      text-align: left;
+      border-right: 1px solid rgba(0, 0, 0, 0.03);
+      height: 36px;
+    }
+
+    .sh-subtable-header.corp {
+      color: var(--brown-main);
+      border-radius: 5px 0 0 0;
+      background: rgba(232, 221, 208, 0.50);
+    }
+    .sh-subtable-header.corp th {
+      background: rgba(232, 221, 208, 0.50);
+    }
+    .sh-subtable-header.corp th:first-child {
+      border-radius: 5px 0 0 0;
+    }
+
+    .sh-subtable-header.ind {
+      color: var(--green-main);
+      border-radius: 5px 4px 0 0;
+      background: #DDF3EB;
+    }
+    .sh-subtable-header.ind th {
+      background: #DDF3EB;
+    }
+    .sh-subtable-header.ind th:first-child {
+      border-radius: 5px 0 0 0;
+    }
+    .sh-subtable-header.ind th:last-child {
+      border-radius: 0 4px 0 0;
+    }
+
+    .sh-subtable th {
+      font-weight: 500;
+      border-right: 1px solid rgba(0, 0, 0, 0.03);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sh-subtable thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      color: #555555;
+      text-align: center !important;
+    }
+
+    .sh-subtable th:nth-child(1),
+    .sh-subtable td:nth-child(1) {
+      width: 28%;
+    }
+
+    .sh-subtable th:nth-child(2),
+    .sh-subtable td:nth-child(2),
+    .sh-subtable th:nth-child(3),
+    .sh-subtable td:nth-child(3) {
+      width: 25%;
+    }
+
+    .sh-subtable th:nth-child(4),
+    .sh-subtable td:nth-child(4) {
+      width: 23%;
+    }
+
+    .sh-subtable tbody td:nth-child(n + 2) {
+      text-align: right !important;
+    }
+
+    .sh-subtable th:last-child {
+      border-right: none;
+    }
+
+    .thead-unit {
+      font-weight: 400;
+    }
+
+    .sh-subtable td {
+      height: 44px;
+      padding: 4px 12px;
+      border-bottom: 1px dotted var(--border-color);
+      font-weight: 600;
+    }
+
+    .sh-subtable tbody td {
+      color: #000 !important;
+    }
+
+    .sh-subtable tbody td:first-child {
+      white-space: nowrap;
+    }
+
+    .sh-subtable tbody td:nth-child(-n + 2) {
+      font-weight: 400;
+    }
+
+    .sh-subtable tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Valuation Panel Content */
+    .val-table-wrap {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 388px;
+      overflow: hidden;
+      padding: 4px;
+      border-radius: 11px 9px 9px 9px;
+      background: #E8E1D0;
+    }
+
+    .val-table {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 18px;
+      overflow: hidden;
+      border-radius: 7px 5px 5px 5px;
+      border: 1px solid #683501;
+      background: #FFF;
+    }
+
+    .val-table thead,
+    .val-table tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .val-table th:nth-child(1),
+    .val-table td:nth-child(1) {
+      width: 12%;
+    }
+
+    .val-table th:nth-child(2),
+    .val-table td:nth-child(2) {
+      width: 17%;
+    }
+
+    .val-table th:nth-child(3),
+    .val-table td:nth-child(3),
+    .val-table th:nth-child(4),
+    .val-table td:nth-child(4) {
+      width: 16%;
+    }
+
+    .val-table th:nth-child(5),
+    .val-table td:nth-child(5) {
+      width: 15%;
+    }
+
+    .val-table th:nth-child(6),
+    .val-table td:nth-child(6) {
+      width: 24%;
+    }
+
+
+
+    .val-table th {
+      font-weight: 500;
+      color: #555555;
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 8px;
+      text-align: center;
+      background-color: #faf9f6;
+      line-height: 22px;
+    }
+
+    .val-table td {
+      height: 44px;
+      padding: 6px 8px;
+      border-bottom: none;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .val-table tbody tr td:last-child {
+      text-align: right;
+    }
+
+    .val-table tbody tr:not(.val-table-year-row) td:not(:last-child) {
+      color: #000 !important;
+      font-weight: 400;
+    }
+
+    .val-table tbody tr:not(.val-first-row):not(.val-table-year-row) td:last-child {
+      font-weight: 400;
+    }
+
+    .val-table tbody tr.val-first-row td {
+      font-weight: 700 !important;
+      background-color: #FDF5E4 !important;
+    }
+
+    .val-table-quarter-end td {
+      border-bottom: 1.2px dotted var(--border-color);
+    }
+
+    .val-table tbody tr:hover td {
+      background-color: rgba(137, 116, 69, 0.02);
+    }
+
+    .val-table-year-row td {
+      height: 0;
+      padding: 8px 0 5px 16px;
+      text-align: left !important;
+      font-size: 14px;
+      font-weight: 700;
+      color: #AFAFAF;
+      background: transparent;
+      border-bottom: none;
+    }
+
+    .val-change-up {
+      color: #A90000;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .val-change-down {
+      color: #0169D8;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    /* -------------------------------------------------------------
+       Bottom Holdings Section
+       ------------------------------------------------------------- */
+    .holdings-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .holdings-title {
+      font-size: 25px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+
+    .holdings-title-sub {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .holdings-container {
+      display: flex;
+      gap: 30px;
+      align-items: stretch;
+      overflow-x: auto;
+      padding-left: 30px;
+      padding-right: 30px;
+      padding-bottom: 8px;
+    }
+
+    .holdings-total-card {
+      width: 247px;
+      background: var(--gold-gradient);
+      border: 1.5px solid var(--gold-border);
+      border-radius: 12px;
+      padding: 33px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(137, 116, 69, 0.04);
+    }
+
+    .total-card-label {
+      font-size: 16px;
+      color: #090909;
+      font-weight: 500;
+      margin-bottom: 10px;
+      lefter-spaicing:-1px;
+    }
+
+    .total-card-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #402D00;
+      line-height: 0.9;
+    }
+
+    .holdings-grid {
+      display: flex;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .holding-item-card {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+      border-top: 1px solid var(--card-color) !important;
+      border-radius: 4px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 8px rgba(62, 51, 44, 0.02);
+      background: #FFF;
+    }
+
+    .holding-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--card-color, #888) 12%, transparent) 0%, color-mix(in srgb, var(--card-color, #888) 0%, transparent) 100%);
+      background-blend-mode: darken;
+      height: 50px !important;
+      box-sizing: border-box;
+      padding: 28px 12px 0;
+      flex-shrink: 0;
+    }
+
+    .holding-card-logo {
+      height: 18px;
+      max-width: 45px;
+      object-fit: contain;
+    }
+
+    .holding-card-name {
+      font-size: 22px;
+      font-weight: 700;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .holding-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 20px 24px 26px 24px;
+    }
+
+    .holding-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      align-items: center;
+    }
+
+    .holding-row:nth-child(1),
+    .holding-row:nth-child(2) {
+      color: #000000;
+    }
+
+    .holding-row:nth-child(2) {
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+    }
+
+    .holding-row:nth-child(3),
+    .holding-row:nth-child(4),
+    .holding-row:nth-child(5) {
+      color: rgba(0, 0, 0, 0.60);
+    }
+
+    .holding-label {
+      color: inherit;
+      opacity: 0.7;
+      font-weight: 400;
+    }
+
+    .holding-value {
+      font-weight: 400;
+      color: inherit;
+    }
+
+    .holding-unit {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+
+    .holding-row.main {
+    }
+
+    .holding-row.main .holding-value,
+    .holding-row:nth-child(2) .holding-value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .holding-row:nth-child(3) .holding-value,
+    .holding-row:nth-child(4) .holding-value {
+      font-size: 18px;
+    }
+
+    .holding-row:nth-child(3) .holding-value,
+    .holding-row:nth-child(4) .holding-value,
+    .holding-row:nth-child(5) .holding-value {
+      color: #000 !important;
+    }
+
+    .empty-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+      background: #ffffff;
+      border: 1px dashed var(--border-color);
+      border-radius: 12px;
+      width: 100%;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="detail-container">
+    <!-- Top Region -->
+    <div class="top-region">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-category" id="company-category">ENG. Business</div>
+        
+        <div class="sidebar-logo-container" id="logo-wrap">
+          <div class="sidebar-logo-placeholder" id="logo-placeholder">-</div>
+        </div>
+        
+        <h1 class="sidebar-title" id="company-name">-</h1>
+        <div class="sidebar-subtitle" id="company-type">-</div>
+        
+        <div class="sidebar-info-list">
+          <div class="sidebar-info-item">
+            <span class="sidebar-info-label">설립일</span>
+            <span class="sidebar-info-value" id="info-est-date">-</span>
+          </div>
+          <div class="sidebar-info-item">
+            <span class="sidebar-info-label">업종</span>
+            <span class="sidebar-info-value" id="info-industry">-</span>
+          </div>
+          <div class="sidebar-info-item">
+            <span class="sidebar-info-label">대표이사</span>
+            <span class="sidebar-info-value" id="info-ceo">-</span>
+          </div>
+          <div class="sidebar-info-item">
+            <span class="sidebar-info-label">등기이사</span>
+            <span class="sidebar-info-value" id="info-directors">-</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Top Right Main Content -->
+      <main class="top-right-content">
+        <!-- Top Cards (KPI bar) -->
+        <section class="top-cards-row">
+          <div class="metric-card">
+            <div class="metric-icon-wrap">
+              <img src="../images/bid stock 1.svg" class="metric-icon-img" />
+            </div>
+            <div class="metric-details">
+              <span class="metric-label">발행주식총수</span>
+              <span class="metric-value" id="metric-shares">-</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-wrap">
+              <img src="../images/currency 1.svg" class="metric-icon-img" />
+            </div>
+            <div class="metric-details">
+              <span class="metric-label">주당 액면가</span>
+              <span class="metric-value" id="metric-par">-</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-wrap">
+              <img src="../images/growth 1.svg" class="metric-icon-img" />
+            </div>
+            <div class="metric-details">
+              <span class="metric-label">주당 평가액</span>
+              <span class="metric-value" id="metric-price">-</span>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-wrap">
+              <img src="../images/enterprise 1.svg" class="metric-icon-img" />
+            </div>
+            <div class="metric-details">
+              <span class="metric-label">기업가치 (평가총액)</span>
+              <span class="metric-value" id="metric-value">-</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Middle Row (Shareholders + Valuation) -->
+        <section class="middle-panels-row">
+          <!-- Left Panel: 총괄 주주 현황 -->
+          <div class="panel-card">
+            <h2 class="panel-title">총괄 주주 현황</h2>
+            <div class="sh-panel-content">
+              <div class="sh-donut-section">
+                <!-- Left: Corporate Details -->
+                <div class="donut-side-info corp-side">
+                  <img src="../images/corporation.svg" class="donut-side-icon corp-icon" />
+                  <div class="donut-side-details">
+                    <div class="donut-side-header">
+                      <span class="donut-side-label corp">법인</span>
+                      <span class="donut-side-pct corp" id="donut-corp-pct">-</span>
+                    </div>
+                    <div class="donut-side-shares" id="donut-corp-shares-num">-</div>
+                    <div class="donut-side-val" id="donut-corp-val-num">-</div>
+                  </div>
+                </div>
+
+                <!-- Center: Donut Chart -->
+                <div class="donut-chart-wrap">
+                  <svg id="donut-svg" width="154" height="154"></svg>
+                  <div class="donut-chart-center">
+                    <div class="donut-center-label">총 주식 금액</div>
+                    <div class="donut-center-value" id="donut-total-capital">-</div>
+                  </div>
+                </div>
+
+                <!-- Right: Individual Details -->
+                <div class="donut-side-info ind-side">
+                  <div class="donut-side-details text-right">
+                    <div class="donut-side-header">
+                      <span class="donut-side-pct ind" id="donut-ind-pct">-</span>
+                      <span class="donut-side-label ind">개인</span>
+                    </div>
+                    <div class="donut-side-shares" id="donut-ind-shares-num">-</div>
+                    <div class="donut-side-val" id="donut-ind-val-num">-</div>
+                  </div>
+                  <img src="../images/person.svg" class="donut-side-icon ind-icon" />
+                </div>
+              </div>
+              <div class="sh-lists-frame">
+                <div class="sh-lists-grid">
+                  <div class="sh-table-pane">
+                    <table class="sh-subtable">
+                      <thead>
+                        <tr class="sh-subtable-header corp">
+                          <th style="width: 28%">주주</th>
+                          <th style="text-align: right; width: 25%">주식수(주)</th>
+                          <th style="text-align: right; width: 25%">비율<span class="thead-unit">(%)</span></th>
+                          <th style="text-align: right; width: 23%">금액<span class="thead-unit">(억원)</span></th>
+                        </tr>
+                      </thead>
+                      <tbody id="corp-sh-list">
+                        <!-- JS populated -->
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="sh-table-pane">
+                    <table class="sh-subtable">
+                      <thead>
+                        <tr class="sh-subtable-header ind">
+                          <th style="width: 28%">주주</th>
+                          <th style="text-align: right; width: 25%">주식수(주)</th>
+                          <th style="text-align: right; width: 25%">비율<span class="thead-unit">(%)</span></th>
+                          <th style="text-align: right; width: 23%">금액<span class="thead-unit">(억원)</span></th>
+                        </tr>
+                      </thead>
+                      <tbody id="ind-sh-list">
+                        <!-- JS populated -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Panel: 비상장주식 가치 평가 -->
+          <div class="panel-card">
+            <h2 class="panel-title">비상장주식 가치 평가</h2>
+            <div class="val-table-wrap">
+              <table class="val-table">
+                <thead>
+                  <tr>
+                    <th>구분</th>
+                    <th>평가<br>기준일</th>
+                    <th>적용<br>할인율<br><span class="thead-unit">(%)</span></th>
+                    <th>주당<br>평가액<br><span class="thead-unit">(원)</span></th>
+                    <th>기업가치<br>(평가총액)<br><span class="thead-unit">(억원)</span></th>
+                    <th>전분기 대비<br>증감</th>
+                  </tr>
+                </thead>
+                <tbody id="valuation-history-rows">
+                  <!-- JS populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Bottom Region (Full Width Holdings) -->
+    <div class="bottom-region">
+      <!-- Bottom Row -->
+      <section class="holdings-section">
+        <h2 class="holdings-title">
+          보유 주식 현황
+          <span class="holdings-title-sub">(직접 보유 지분)</span>
+        </h2>
+        <div class="holdings-container">
+          <div class="holdings-total-card">
+            <span class="total-card-label">보유주식 총 평가액</span>
+            <span class="total-card-value" id="holdings-total-value">-</span>
+          </div>
+          <div class="holdings-grid" id="holdings-cards-container">
+            <!-- JS populated -->
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Data & Render Script -->
+  <script>
+    // Asset base path for logos
+    const Zo = "https://b22036tdchanmacgroup-source.github.io/HM_MISystem/";
+
+    // 1. Static Mockup Metadata & Valuation History Database
+    const METADATA_DB = {
+      hanmaek: {
+        category: "ENG. Business",
+        ceo: "김원근, 최영수",
+        directors: "신현우, 신광수",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "30.0", price: "274,500", val: "53.8", change: "up", changeVal: "999", changePct: "1.7%" },
+          { q: "2026년 1분기", date: "3월 31일", discount: "23.0", price: "289,000", val: "55.6", change: "up", changeVal: "889", changePct: "1.63%" },
+          { q: "2025년 4분기", date: "12월 31일", discount: "25.0", price: "284,000", val: "54.7", change: "up", changeVal: "978", changePct: "1.8%" },
+          { q: "2025년 3분기", date: "9월 30일", discount: "0.0", price: "0", val: "0", change: "down", changeVal: "890", changePct: "0.2%" },
+          { q: "2025년 2분기", date: "6월 30일", discount: "0.0", price: "0", val: "0", change: "none", changeVal: "—", changePct: "" },
+          { q: "2025년 1분기", date: "3월 31일", discount: "0.0", price: "0", val: "0", change: "none", changeVal: "—", changePct: "" },
+          { q: "2024년 4분기", date: "12월 31일", discount: "0.0", price: "0", val: "0", change: "none", changeVal: "—", changePct: "" },
+          { q: "2024년 3분기", date: "9월 30일", discount: "0.0", price: "0", val: "0", change: "none", changeVal: "—", changePct: "" },
+          { q: "2024년 2분기", date: "6월 30일", discount: "0.0", price: "0", val: "0", change: "none", changeVal: "—", changePct: "" },
+          { q: "2024년 1분기", date: "3월 31일", discount: "0.0", price: "0", val: "0", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      saman: {
+        category: "ENG. Business",
+        ceo: "최동식",
+        directors: "이재만, 한종철",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "20.0", price: "212,304", val: "127.1", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      ptc: {
+        category: "Manufacture & Construction",
+        ceo: "김종도",
+        directors: "박일규, 오창영",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "25.0", price: "122,707", val: "3.7", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      baron: {
+        category: "IT Business",
+        ceo: "장종찬",
+        directors: "윤상근, 최인호",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "20.0", price: "15,178", val: "0.3", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      jp: {
+        category: "Manufacture & Construction",
+        ceo: "배문교",
+        directors: "안병록, 강용석",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "25.0", price: "177,774", val: "46.2", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      jhind: {
+        category: "IT Business",
+        ceo: "장종찬",
+        directors: "배문교, 정규민",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "—", price: "평가 전", val: "평가 전", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      jh: {
+        category: "Manufacture & Construction",
+        ceo: "안병록",
+        directors: "배문교, 김기원",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "—", price: "평가 전", val: "평가 전", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      halla: {
+        category: "Environment EPC & Plant",
+        ceo: "김원근, 최영수",
+        directors: "박상혁, 서성오",
+        parValue: 1000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "22.0", price: "1,010", val: "13.3", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      sanha: {
+        category: "IT Business",
+        ceo: "홍길동",
+        directors: "김영희, 이철수",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "—", price: "평가 전", val: "평가 전", change: "none", changeVal: "—", changePct: "" }
+        ]
+      },
+      hyunta: {
+        category: "IT Business",
+        ceo: "김현타",
+        directors: "박현타, 이현타",
+        parValue: 5000,
+        history: [
+          { q: "2026년 2분기", date: "6월 30일", discount: "—", price: "평가 전", val: "평가 전", change: "none", changeVal: "—", changePct: "" }
+        ]
+      }
+    };
+
+    // Override values specifically for hanmaek to match user mock layout
+    const MOCK_HOLDINGS_OVERRIDE = {
+      hanmaek: {
+        totalVal: "714.8",
+        cards: [
+          { name: "한맥기술", logo: "../images/Hanmac.svg", pct: "11.5", val: "61.6", shares: "22,443", price: "274,500", note: "자사주" },
+          { name: "삼안", logo: "../images/Saman.svg", pct: "25.2", val: "320.5", shares: "150,968", price: "212,304", note: "-" },
+          { name: "피티씨", logo: "../images/PTC.svg", pct: "9.8", val: "31.2", shares: "25,480", price: "122,707", note: "-" },
+          { name: "한라산업개발", logo: "../images/Halla.svg", pct: "9.7", val: "0.2", shares: "25,402", price: "1,010", note: "-" },
+          { name: "장헌파트너스", logo: "../images/Jangheon.svg", pct: "9.6", val: "19.9", shares: "24,960", price: "80,000", note: "-" }
+        ]
+      }
+    };
+
+    // Streamlined fallback DEFAULT_DATA for standalone preview/refresh
+    const DEFAULT_DATA = {
+      Qo: {
+        navy: { fill: "#ffffff", stroke: "#2b3f87" },
+        purple: { fill: "#ffffff", stroke: "#6a3d9a" },
+        sky: { fill: "#ffffff", stroke: "#5aa7d6" },
+        black: { fill: "#ffffff", stroke: "#1f1f1f" },
+        non: { fill: "#ffffff", stroke: "#a8a795" },
+        red: { fill: "#ffffff", stroke: "#CF2120" },
+        amber: { fill: "#ffffff", stroke: "#e08c1a" }
+      },
+      es: {
+        nodes: [
+          { id: "baron", name: "바론컨설턴트", logo: "Baron.svg" },
+          { id: "ptc", name: "피티씨", logo: "PTC.svg" },
+          { id: "hanmaek", name: "한맥기술", logo: "Hanmac.svg" },
+          { id: "jp", name: "장헌파트너스", logo: "Jangheon.svg" },
+          { id: "saman", name: "삼안", logo: "Saman.svg" },
+          { id: "jhind", name: "장헌산업", logo: "Jangheon.svg" },
+          { id: "jh", name: "(주)장헌", logo: "jh.svg" },
+          { id: "halla", name: "한라산업개발", logo: "Halla.svg" },
+          { id: "sanha", name: "산하종합기술", logo: "shtnc.png" },
+          { id: "hyunta", name: "현타", logo: "Mask group.svg" }
+        ],
+        links: [
+          { s: "baron", t: "ptc", pct: "44.55%" },
+          { s: "baron", t: "hanmaek", pct: "8.67%" },
+          { s: "baron", t: "jp", pct: "9.60%" },
+          { s: "baron", t: "saman", pct: "2.36%" },
+          { s: "ptc", t: "hanmaek", pct: "9.86%" },
+          { s: "hanmaek", t: "ptc", pct: "9.80%" },
+          { s: "jp", t: "hanmaek", pct: "9.81%" },
+          { s: "hanmaek", t: "jp", pct: "9.60%" },
+          { s: "jp", t: "saman", pct: "65.39%" },
+          { s: "ptc", t: "jp", pct: "9.73%" },
+          { s: "hanmaek", t: "saman", pct: "25.21%" },
+          { s: "saman", t: "halla", pct: "90.23%" },
+          { s: "hanmaek", t: "halla", pct: "9.77%" },
+          { s: "baron", t: "open", pct: "80.0%" },
+          { s: "open", t: "jhind", pct: "100.0%" },
+          { s: "ptc", t: "jh", pct: "100.0%" }
+        ]
+      },
+      _s: {
+        hanmaek: { estDate: "1996-05-03", industry: "토목엔지니어링", ceo: "김원근, 최영수", directors: "신현우, 신광수", firmType: "외감기업", totalSharesNum: "196,000주", pricePerShare: "288,967원", k: "red" },
+        saman: { estDate: "1967-12-30", industry: "토목엔지니어링", ceo: "최동식", directors: "이재만, 한종철", firmType: "외감기업", totalSharesNum: "598,789주", pricePerShare: "212,304원", k: "amber" },
+        jp: { estDate: "2009-11-20", industry: "토목시공", ceo: "배문교", directors: "안병록, 강용석", firmType: "외감기업", totalSharesNum: "260,000주", pricePerShare: "177,774원", k: "sky" },
+        jhind: { estDate: "(작성예정)", industry: "제조", ceo: "장종찬", directors: "배문교, 정규민", firmType: "외감기업", totalSharesNum: "260,000주", pricePerShare: "평가 전", k: "sky" },
+        jh: { estDate: "2009-11-16", industry: "토목시공", ceo: "안병록", directors: "배문교, 김기원", firmType: "비외감기업", totalSharesNum: "190,000주", pricePerShare: "평가 전", k: "sky" },
+        ptc: { estDate: "(작성예정)", industry: "토목시공", ceo: "김종도", directors: "박일규, 오창영", firmType: "비외감기업", totalSharesNum: "30,000주", pricePerShare: "122,707원", k: "purple" },
+        baron: { estDate: "2006-06-21", industry: "토목소프트웨어 개발, 공급", ceo: "장종찬", directors: "윤상근, 최인호", firmType: "비외감기업", totalSharesNum: "20,000주", pricePerShare: "15,178원", k: "navy" },
+        halla: { estDate: "1999-04-09", industry: "전기·설비·환경·플랜트", ceo: "김원근, 최영수", directors: "박상혁, 서성오", firmType: "외감기업", totalSharesNum: "13,130,120주", pricePerShare: "1,010원", k: "non" },
+        sanha: { estDate: "(작성예정)", industry: "토목 엔지니어링", ceo: "홍길동", directors: "김영희, 이철수", firmType: "비외감기업", totalSharesNum: "100,000주", pricePerShare: "평가 전", k: "black" },
+        hyunta: { estDate: "(작성예정)", industry: "블록체인 소프트웨어", ceo: "김현타", directors: "박현타, 이현타", firmType: "비외감기업", totalSharesNum: "60,000주", pricePerShare: "평가 전", k: "black" }
+      },
+      gs: [
+        {
+          nodeId: "hanmaek", name: "한맥기술", k: "red",
+          shareholders: [
+            { name: "주주1", type: "개인", pct: "40.73%" },
+            { name: "한맥기술", type: "법인", pct: "11.45%" },
+            { name: "피티씨", type: "법인", pct: "9.86%" },
+            { name: "장헌파트너스", type: "법인", pct: "9.81%" },
+            { name: "바론컨설턴트", type: "법인", pct: "8.67%" },
+            { name: "주주2", type: "개인", pct: "6.64%" },
+            { name: "주주3", type: "개인", pct: "5.31%" },
+            { name: "주주4", type: "개인", pct: "4.09%" },
+            { name: "주주5", type: "개인", pct: "3.44%" }
+          ]
+        },
+        {
+          nodeId: "saman", name: "삼안", k: "amber",
+          shareholders: [
+            { name: "장헌파트너스", type: "법인", pct: "65.39%" },
+            { name: "한맥기술", type: "법인", pct: "25.21%" },
+            { name: "농협은행", type: "법인", pct: "3.42%" },
+            { name: "바론컨설턴트", type: "법인", pct: "2.36%" },
+            { name: "우리은행", type: "법인", pct: "2.09%" },
+            { name: "기업은행", type: "법인", pct: "1.36%" },
+            { name: "기타", type: "개인", pct: "0.16%" }
+          ]
+        },
+        {
+          nodeId: "jp", name: "장헌파트너스", k: "sky",
+          shareholders: [
+            { name: "주주1", type: "개인", pct: "45.32%" },
+            { name: "피티씨", type: "법인", pct: "9.73%" },
+            { name: "한맥기술", type: "법인", pct: "9.60%" },
+            { name: "바론컨설턴트", type: "법인", pct: "9.60%" },
+            { name: "주주2", type: "개인", pct: "7.47%" },
+            { name: "주주3", type: "개인", pct: "4.60%" },
+            { name: "주주4", type: "개인", pct: "3.88%" },
+            { name: "주주5", type: "개인", pct: "3.30%" },
+            { name: "주주6", type: "개인", pct: "2.45%" },
+            { name: "주주7", type: "개인", pct: "2.45%" },
+            { name: "주주8", type: "개인", pct: "1.60%" }
+          ]
+        },
+        {
+          nodeId: "jhind", name: "장헌산업", k: "sky",
+          shareholders: [
+            { name: "장헌파트너스", type: "법인", pct: "100.00%" }
+          ]
+        },
+        {
+          nodeId: "jh", name: "(주)장헌", k: "sky",
+          shareholders: [
+            { name: "피티씨", type: "법인", pct: "100.00%" }
+          ]
+        },
+        {
+          nodeId: "ptc", name: "피티씨", k: "purple",
+          shareholders: [
+            { name: "바론컨설턴트", type: "법인", pct: "44.55%" },
+            { name: "주주1", type: "개인", pct: "38.10%" },
+            { name: "한맥기술", type: "법인", pct: "9.80%" },
+            { name: "주주2", type: "개인", pct: "4.10%" },
+            { name: "주주3", type: "개인", pct: "3.45%" }
+          ]
+        },
+        {
+          nodeId: "baron", name: "바론컨설턴트", k: "navy",
+          shareholders: [
+            { name: "주주1", type: "개인", pct: "70.00%" },
+            { name: "주주2", type: "개인", pct: "30.00%" }
+          ]
+        },
+        {
+          nodeId: "halla", name: "한라산업개발", k: "non",
+          shareholders: [
+            { name: "삼안", type: "법인", pct: "90.23%" },
+            { name: "한맥기술", type: "법인", pct: "9.77%" }
+          ]
+        },
+        {
+          nodeId: "sanha", name: "산하종합기술", k: "black",
+          shareholders: [
+            { name: "주주1", type: "개인", pct: "43.30%" },
+            { name: "주주2", type: "개인", pct: "38.70%" },
+            { name: "주주3", type: "개인", pct: "6.00%" },
+            { name: "주주4", type: "개인", pct: "4.00%" },
+            { name: "주주5", type: "개인", pct: "4.00%" },
+            { name: "주주6", type: "개인", pct: "4.00%" }
+          ]
+        },
+        {
+          nodeId: "hyunta", name: "현타", k: "black",
+          shareholders: [
+            { name: "주주1", type: "개인", pct: "100.00%" }
+          ]
+        }
+      ]
+    };
+
+    // Resolve query parameters to find active nodeId
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedNodeId = urlParams.get('id') || 'hanmaek';
+
+    // Get live data from parent or default to fallback if none
+    let DATA = DEFAULT_DATA;
+    try {
+      if (window.opener && window.opener.DATA) {
+        DATA = window.opener.DATA;
+      }
+    } catch (e) {
+      console.warn("Parent window DATA access blocked (cross-origin / local file security):", e);
+    }
+
+    // Helper: format numbers
+    function formatNumber(num) {
+      if (isNaN(num)) return '-';
+      return Math.round(num).toLocaleString('ko-KR');
+    }
+
+    function formatNumber1Dec(num) {
+      if (isNaN(num)) return '-';
+      return (Math.round(num * 10) / 10).toLocaleString('ko-KR', { minimumFractionDigits: 1 });
+    }
+
+    // Helper: Resolve Logo paths
+    function getLocalLogoPath(logoPath, nodeId) {
+      if (nodeId === 'hyunta') return '../images/Mask group.svg';
+      if (nodeId === 'jh') return '../images/jh.svg';
+      if (!logoPath) return '';
+      const parts = logoPath.split('/');
+      let filename = parts[parts.length - 1];
+      if (filename === 'jangheon_1.svg') {
+        filename = 'Jangheon.svg';
+      }
+      return '../images/' + filename;
+    }
+
+    // Initialize Dashboard
+    function initDashboard() {
+      // Find company record inside DATA
+      let company = null;
+      let sRecord = null;
+      let color = '#8a8f9a';
+
+      if (DATA) {
+        company = DATA.gs.find(c => c.nodeId === selectedNodeId);
+        sRecord = DATA._s[selectedNodeId];
+        color = DATA.Qo[sRecord?.k || company?.k]?.stroke || '#8a8f9a';
+      }
+
+
+
+      // Metadata lookup
+      const meta = METADATA_DB[selectedNodeId] || {
+        category: "가족사",
+        ceo: sRecord?.ceo || "정보 없음",
+        directors: "정보 없음",
+        parValue: 5000,
+        history: []
+      };
+
+      // Set category, name, and classification
+      document.getElementById('company-category').innerText = meta.category;
+      document.getElementById('company-name').innerText = company ? company.name : (selectedNodeId === 'hanmaek' ? '한맥기술' : selectedNodeId);
+      document.getElementById('company-type').innerText = sRecord ? `(${sRecord.firmType})` : '(외감기업)';
+
+      // Set Logo
+      const nodeData = DATA?.es?.nodes?.find(n => n.id === selectedNodeId) || DATA?.ts?.find(n => n.id === selectedNodeId);
+      const logoUrl = getLocalLogoPath(nodeData?.logo || '', selectedNodeId);
+      const logoWrap = document.getElementById('logo-wrap');
+      
+      if (logoUrl) {
+        logoWrap.innerHTML = `<img src="${logoUrl}" class="sidebar-logo" onerror="this.outerHTML='<div class=&quot;sidebar-logo-placeholder&quot; style=&quot;background: ${color}&quot;>${(company?.name || '한').slice(0, 1)}</div>'" />`;
+      } else {
+        document.getElementById('logo-placeholder').style.backgroundColor = color;
+        document.getElementById('logo-placeholder').innerText = (company?.name || '한').slice(0, 1);
+      }
+
+      // Sidebar info list
+      document.getElementById('info-est-date').innerText = sRecord?.estDate ? sRecord.estDate.replace(/-/g, '.') : '-';
+      document.getElementById('info-industry').innerText = sRecord?.industry || '-';
+      document.getElementById('info-ceo').innerText = sRecord?.ceo || meta.ceo;
+      document.getElementById('info-directors').innerText = sRecord?.directors || meta.directors;
+
+      // Top Metrics Cards
+      let totalSharesVal = sRecord ? parseFloat(sRecord.totalSharesNum.replace(/[^0-9]/g, '')) : 196000;
+      let parValue = meta.parValue || 5000;
+      let valuationHistory = meta.history || [];
+      let latestPrice = valuationHistory.length > 0 ? parseFloat(valuationHistory[0].price.replace(/,/g, '')) : NaN;
+      if (isNaN(latestPrice) && sRecord && sRecord.pricePerShare !== '(평가 예정)') {
+        latestPrice = parseFloat(sRecord.pricePerShare.replace(/[^0-9]/g, ''));
+      }
+
+      let sharesVal = sRecord ? sRecord.totalSharesNum : '196,000주';
+      let sharesNum = sharesVal.replace(/[^0-9,]/g, '');
+      let sharesUnit = sharesVal.replace(/[0-9,]/g, '') || '주';
+      document.getElementById('metric-shares').innerHTML = `${sharesNum}<span class="metric-unit">${sharesUnit}</span>`;
+
+      document.getElementById('metric-par').innerHTML = `${parValue.toLocaleString('ko-KR')}<span class="metric-unit">원</span>`;
+
+      if (!isNaN(latestPrice)) {
+        document.getElementById('metric-price').innerHTML = `${latestPrice.toLocaleString('ko-KR')}<span class="metric-unit">원</span>`;
+      } else {
+        document.getElementById('metric-price').innerHTML = `평가 예정`;
+      }
+
+      let evVal = '-';
+      if (!isNaN(latestPrice)) {
+        let ev = (totalSharesVal * latestPrice) / 100000000; // in 100M KRW
+        evVal = formatNumber1Dec(ev) + '억원';
+        let evNum = evVal.replace(/[^0-9.]/g, '');
+        let evUnit = evVal.replace(/[0-9.]/g, '');
+        document.getElementById('metric-value').innerHTML = `${evNum}<span class="metric-unit">${evUnit}</span>`;
+      } else {
+        document.getElementById('metric-value').innerHTML = `-`;
+      }
+
+      // -------------------------------------------------------------
+      // 2. Render Donut Chart & Shareholders Table
+      // -------------------------------------------------------------
+      let corpShs = [];
+      let indShs = [];
+      
+      if (company) {
+        corpShs = company.shareholders.filter(s => s.type === '법인');
+        indShs = company.shareholders.filter(s => s.type !== '법인');
+      } else if (selectedNodeId === 'hanmaek') {
+        // Fallback mockup list for Hanmac
+        corpShs = [
+          { name: "한맥기술", pct: "11.5%" },
+          { name: "피티씨", pct: "9.8%" },
+          { name: "장헌파트너스", pct: "9.8%" },
+          { name: "바론", pct: "8.6%" }
+        ];
+        indShs = [
+          { name: "한형관", pct: "40.7%" },
+          { name: "최동식", pct: "6.6%" },
+          { name: "이용근", pct: "5.3%" },
+          { name: "이경훈", pct: "4.0%" },
+          { name: "최영수", pct: "3.4%" }
+        ];
+      }
+
+      let totalCorpPct = corpShs.reduce((acc, s) => acc + parseFloat(s.pct), 0);
+      let totalIndPct = indShs.reduce((acc, s) => acc + parseFloat(s.pct), 0);
+
+      let corpCapital = (totalSharesVal * (totalCorpPct / 100) * parValue) / 100000000;
+      let indCapital = (totalSharesVal * (totalIndPct / 100) * parValue) / 100000000;
+      let totalCapital = corpCapital + indCapital;
+
+      document.getElementById('donut-total-capital').innerHTML = formatNumber1Dec(totalCapital) + '<span style="font-size: 14px; font-weight: 600; color: var(--text-muted); margin-left: 2px;">억원</span>';
+
+      document.getElementById('donut-corp-pct').innerHTML = totalCorpPct.toFixed(1) + '<span style="font-size: 18px; font-weight: 700; margin-left: 1px;">%</span>';
+      document.getElementById('donut-corp-shares-num').innerHTML = formatNumber(totalSharesVal * (totalCorpPct / 100)) + '<span style="font-size: 18px; color: var(--text-muted); font-weight: 500; margin-left: 2px;">주</span>';
+      document.getElementById('donut-corp-val-num').innerHTML = formatNumber1Dec(corpCapital) + '<span style="font-size: 14px; color: var(--text-muted); font-weight: 500; margin-left: 2px;">억원</span>';
+
+      document.getElementById('donut-ind-pct').innerHTML = totalIndPct.toFixed(1) + '<span style="font-size: 18px; font-weight: 700; margin-left: 1px;">%</span>';
+      document.getElementById('donut-ind-shares-num').innerHTML = formatNumber(totalSharesVal * (totalIndPct / 100)) + '<span style="font-size: 18px; color: var(--text-muted); font-weight: 500; margin-left: 2px;">주</span>';
+      document.getElementById('donut-ind-val-num').innerHTML = formatNumber1Dec(indCapital) + '<span style="font-size: 14px; color: var(--text-muted); font-weight: 500; margin-left: 2px;">억원</span>';
+
+      // Populate Shareholders lists
+      const corpListBody = document.getElementById('corp-sh-list');
+      corpListBody.innerHTML = '';
+      corpShs.forEach(sh => {
+        let pct = parseFloat(sh.pct);
+        let shShares = totalSharesVal * (pct / 100);
+        let shVal = (shShares * parValue) / 100000000;
+        corpListBody.innerHTML += `
+          <tr>
+            <td>${sh.name}</td>
+            <td style="text-align: right">${formatNumber(shShares)}</td>
+            <td style="text-align: right; color: var(--brown-main); font-weight: 700;">${pct.toFixed(1)}</td>
+            <td style="text-align: right">${formatNumber1Dec(shVal)}</td>
+          </tr>
+        `;
+      });
+
+      const indListBody = document.getElementById('ind-sh-list');
+      indListBody.innerHTML = '';
+      indShs.forEach(sh => {
+        let pct = parseFloat(sh.pct);
+        let shShares = totalSharesVal * (pct / 100);
+        let shVal = (shShares * parValue) / 100000000;
+        indListBody.innerHTML += `
+          <tr>
+            <td>${sh.name}</td>
+            <td style="text-align: right">${formatNumber(shShares)}</td>
+            <td style="text-align: right; color: var(--green-main); font-weight: 700;">${pct.toFixed(1)}</td>
+            <td style="text-align: right">${formatNumber1Dec(shVal)}</td>
+          </tr>
+        `;
+      });
+
+      // Render Donut Chart D3
+      const donutSvg = d3.select('#donut-svg');
+      const width = 154, height = 154, radius = Math.min(width, height) / 2;
+      donutSvg.select('defs').remove();
+      const defs = donutSvg.append('defs');
+      const innerGradient = defs.append('linearGradient')
+        .attr('id', 'donut-inner-gradient')
+        .attr('x1', '46.6547')
+        .attr('y1', '0')
+        .attr('x2', '78.0069')
+        .attr('y2', '156.014')
+        .attr('gradientUnits', 'userSpaceOnUse');
+      innerGradient.append('stop')
+        .attr('stop-color', '#FFF');
+      innerGradient.append('stop')
+        .attr('offset', '1')
+        .attr('stop-color', '#FFF')
+        .attr('stop-opacity', '0');
+      const brownGradient = defs.append('linearGradient')
+        .attr('id', 'donut-brown-gradient')
+        .attr('x1', '30%')
+        .attr('y1', '0%')
+        .attr('x2', '70%')
+        .attr('y2', '100%');
+      brownGradient.append('stop')
+        .attr('offset', '0%')
+        .attr('stop-color', '#E2D1B1');
+      brownGradient.append('stop')
+        .attr('offset', '100%')
+        .attr('stop-color', '#8C7434');
+      const greenGradient = defs.append('linearGradient')
+        .attr('id', 'donut-green-gradient')
+        .attr('x1', '30%')
+        .attr('y1', '0%')
+        .attr('x2', '70%')
+        .attr('y2', '100%');
+      greenGradient.append('stop')
+        .attr('offset', '0%')
+        .attr('stop-color', '#9ECCBC');
+      greenGradient.append('stop')
+        .attr('offset', '100%')
+        .attr('stop-color', '#469F80');
+      const donutShadow = defs.append('filter')
+        .attr('id', 'donut-soft-shadow')
+        .attr('x', '-20%')
+        .attr('y', '-20%')
+        .attr('width', '140%')
+        .attr('height', '140%');
+      donutShadow.append('feDropShadow')
+        .attr('dx', '0')
+        .attr('dy', '2')
+        .attr('stdDeviation', '2')
+        .attr('flood-color', '#4F3D1F')
+        .attr('flood-opacity', '0.18');
+      donutSvg.append('circle')
+        .attr('cx', width / 2)
+        .attr('cy', height / 2)
+        .attr('r', radius - 10)
+        .attr('fill', 'url(#donut-inner-gradient)');
+      const g = donutSvg.append('g').attr('transform', `translate(${width / 2},${height / 2})`);
+
+      const corpAngle = (totalCorpPct / (totalCorpPct + totalIndPct)) * Math.PI * 2;
+      const pieStartAngle = (Math.PI * 1.5) - (corpAngle / 2);
+      const pie = d3.pie()
+        .startAngle(pieStartAngle)
+        .endAngle(pieStartAngle + Math.PI * 2)
+        .sort(null)
+        .value(d => d.value);
+
+      const arc = d3.arc()
+        .innerRadius(radius - 10)
+        .outerRadius(radius - 2);
+
+      const donutData = [
+        { name: 'corp', value: totalCorpPct, color: 'url(#donut-brown-gradient)' },
+        { name: 'ind', value: totalIndPct, color: 'url(#donut-green-gradient)' }
+      ];
+
+      g.selectAll('path')
+        .data(pie(donutData))
+        .enter()
+        .append('path')
+        .attr('filter', 'url(#donut-soft-shadow)')
+        .attr('fill', d => d.data.color)
+        .each(function(d) {
+          this._current = { startAngle: d.startAngle, endAngle: d.startAngle };
+        })
+        .transition()
+        .duration(900)
+        .ease(d3.easeCubicOut)
+        .attrTween('d', function(d) {
+          const interpolate = d3.interpolate(this._current, d);
+          this._current = d;
+          return t => arc(interpolate(t));
+        });
+
+      // -------------------------------------------------------------
+      // 3. Render Valuation History
+      // -------------------------------------------------------------
+      const valHistoryBody = document.getElementById('valuation-history-rows');
+      valHistoryBody.innerHTML = '';
+      
+      if (valuationHistory.length > 0) {
+        let currentYear = '';
+        let isFirst = true;
+        valuationHistory.forEach(h => {
+          const qParts = h.q.match(/^(\d{4})년\s*(.+)$/);
+          const yearLabel = qParts ? `${qParts[1]}년` : '';
+          const quarterLabel = qParts ? qParts[2] : h.q;
+          let changeHtml = '';
+          if (h.change === 'up') {
+            changeHtml = `<span class="val-change-up"><span style="margin-right: 4px;">${h.changePct}</span>▲ ${h.changeVal}</span>`;
+          } else if (h.change === 'down') {
+            changeHtml = `<span class="val-change-down"><span style="margin-right: 4px;">${h.changePct}</span>▼ ${h.changeVal}</span>`;
+          } else {
+            changeHtml = `<span>—</span>`;
+          }
+
+          if (yearLabel && yearLabel !== currentYear) {
+            currentYear = yearLabel;
+            valHistoryBody.innerHTML += `
+              <tr class="val-table-year-row">
+                <td colspan="6">${yearLabel}</td>
+              </tr>
+            `;
+          }
+
+          valHistoryBody.innerHTML += `
+            <tr class="${quarterLabel === '1분기' ? 'val-table-quarter-end' : ''} ${isFirst ? 'val-first-row' : ''}">
+              <td>${quarterLabel}</td>
+              <td style="color: var(--text-muted)">${h.date}</td>
+              <td>${h.discount}</td>
+              <td>${h.price === '평가 전' ? h.price : parseInt(h.price.replace(/,/g, '')).toLocaleString('ko-KR')}</td>
+              <td>${h.val === '평가 전' ? h.val : h.val}</td>
+              <td>${changeHtml}</td>
+            </tr>
+          `;
+          isFirst = false;
+        });
+      } else {
+        valHistoryBody.innerHTML = `<tr><td colspan="6" style="padding: 30px; color: var(--text-muted)">평가 이력이 존재하지 않습니다.</td></tr>`;
+      }
+
+      // -------------------------------------------------------------
+      // 4. Render Holdings Cards (Directly Held Shares)
+      // -------------------------------------------------------------
+      const holdingsContainer = document.getElementById('holdings-cards-container');
+      const totalValLabel = document.getElementById('holdings-total-value');
+      
+      // Check for mockup override first
+      if (MOCK_HOLDINGS_OVERRIDE[selectedNodeId]) {
+        let ov = MOCK_HOLDINGS_OVERRIDE[selectedNodeId];
+        totalValLabel.innerHTML = ov.totalVal + '<span class="holding-unit">억원</span>';
+        holdingsContainer.innerHTML = '';
+        
+        ov.cards.forEach(c => {
+          let logoHtml = c.logo 
+            ? `<img src="${c.logo}" class="holding-card-logo" onerror="this.outerHTML='<div class=&quot;sidebar-logo-placeholder&quot; style=&quot;width:18px;height:18px;font-size:10px;&quot;>${c.name.slice(0, 1)}</div>'" />`
+            : `<div class="sidebar-logo-placeholder" style="width:18px;height:18px;font-size:10px;background:#8a8f9a;">${c.name.slice(0, 1)}</div>`;
+ 
+          // Resolve mock card company's node ID to find its color
+          let mockNodeId = '';
+          if (c.name.includes("자사주") || c.name.includes("한맥기술")) mockNodeId = selectedNodeId;
+          else if (c.name.includes("삼안")) mockNodeId = 'saman';
+          else if (c.name.includes("피티씨") || c.name.includes("PTC")) mockNodeId = 'ptc';
+          else if (c.name.includes("한라")) mockNodeId = 'halla';
+          else if (c.name.includes("장헌")) mockNodeId = 'jp';
+          
+          let targetS = DATA?._s[mockNodeId];
+          let targetNode = DATA?.es?.nodes?.find(n => n.id === mockNodeId) || DATA?.ts?.find(n => n.id === mockNodeId);
+          let color = DATA?.Qo[targetS?.k || targetNode?.k || 'non']?.stroke || '#8a8f9a';
+ 
+          let treasuryLabel = c.name === "한맥기술" 
+            ? `<div style="position: absolute; top: 10px; left: 16px; font-size: 16px; font-weight: 400; color: var(--text-muted);">자사주</div>`
+            : '';
+ 
+          holdingsContainer.innerHTML += `
+            <div class="holding-item-card" style="--card-color: ${color};">
+              ${treasuryLabel}
+              <div class="holding-card-header">
+                ${logoHtml}
+                <span class="holding-card-name">${c.name}</span>
+              </div>
+              <div class="holding-card-body">
+                <div class="holding-row main">
+                  <span class="holding-label">보유지분</span>
+                  <span class="holding-value">${c.pct}<span class="holding-unit">%</span></span>
+                </div>
+                <div class="holding-row">
+                  <span class="holding-label">평가액</span>
+                  <span class="holding-value">${c.val}<span class="holding-unit">억원</span></span>
+                </div>
+                <div class="holding-row">
+                  <span class="holding-label">보유주식수</span>
+                  <span class="holding-value">${c.shares}<span class="holding-unit">주</span></span>
+                </div>
+                <div class="holding-row">
+                  <span class="holding-label">주당 평가액</span>
+                  <span class="holding-value">${c.price}<span class="holding-unit">원</span></span>
+                </div>
+                <div class="holding-row">
+                  <span class="holding-label">비고</span>
+                  <span class="holding-value" style="color: var(--text-muted);">${c.note}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        // Calculate dynamically from DATA links
+        let holdings = [];
+        if (DATA) {
+          holdings = DATA.es.links.filter(l => l.s === selectedNodeId);
+        }
+
+        if (holdings.length > 0) {
+          let sumValuation = 0;
+          holdingsContainer.innerHTML = '';
+
+          holdings.forEach(link => {
+            let targetNode = DATA.es.nodes.find(n => n.id === link.t) || DATA.ts.find(n => n.id === link.t);
+            let targetS = DATA._s[link.t];
+            let pct = parseFloat(link.pct);
+
+            let tShares = targetS ? parseFloat(targetS.totalSharesNum.replace(/[^0-9]/g, '')) : 0;
+            let tPrice = targetS && targetS.pricePerShare !== '(평가 예정)' ? parseFloat(targetS.pricePerShare.replace(/[^0-9]/g, '')) : 0;
+            
+            let heldShares = tShares * (pct / 100);
+            let valAmount = (heldShares * tPrice) / 100000000; // in 100M KRW
+            sumValuation += valAmount;
+
+            let targetColor = DATA.Qo[targetS?.k || targetNode?.k]?.stroke || '#8a8f9a';
+            let tLogoUrl = getLocalLogoPath(targetNode?.logo || '', link.t);
+            let logoHtml = tLogoUrl 
+              ? `<img src="${tLogoUrl}" class="holding-card-logo" onerror="this.outerHTML='<div class=&quot;sidebar-logo-placeholder&quot; style=&quot;width:18px;height:18px;font-size:10px;background:${targetColor}&quot;>${targetNode.name.slice(0, 1)}</div>'" />`
+              : `<div class="sidebar-logo-placeholder" style="width:18px;height:18px;font-size:10px;background:${targetColor};">${targetNode.name.slice(0, 1)}</div>`;
+
+            let treasuryLabel = (targetNode?.id === 'hanmaek' || link.t === 'hanmaek')
+              ? `<div style="position: absolute; top: 10px; left: 16px; font-size: 16px; font-weight: 400; color: var(--text-muted);">자사주</div>`
+              : '';
+
+            holdingsContainer.innerHTML += `
+              <div class="holding-item-card" style="--card-color: ${targetColor};">
+                ${treasuryLabel}
+                <div class="holding-card-header">
+                  ${logoHtml}
+                  <span class="holding-card-name">${targetNode.name}</span>
+                </div>
+                <div class="holding-card-body">
+                  <div class="holding-row main">
+                    <span class="holding-label">보유지분</span>
+                    <span class="holding-value">${pct.toFixed(1)}<span class="holding-unit">%</span></span>
+                  </div>
+                  <div class="holding-row">
+                    <span class="holding-label">평가액</span>
+                    <span class="holding-value">${valAmount > 0 ? formatNumber1Dec(valAmount) + '<span class="holding-unit">억원</span>' : '평가 예정'}</span>
+                  </div>
+                  <div class="holding-row">
+                    <span class="holding-label">보유주식수</span>
+                    <span class="holding-value">${formatNumber(heldShares)}<span class="holding-unit">주</span></span>
+                  </div>
+                  <div class="holding-row">
+                    <span class="holding-label">1주당 평가액</span>
+                    <span class="holding-value">${tPrice > 0 ? formatNumber(tPrice) + '<span class="holding-unit">원</span>' : '평가 예정'}</span>
+                  </div>
+                  <div class="holding-row">
+                    <span class="holding-label">비고</span>
+                    <span class="holding-value" style="color: var(--text-muted);">-</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+ 
+          totalValLabel.innerHTML = sumValuation > 0 ? formatNumber1Dec(sumValuation) + '<span class="holding-unit">억원</span>' : '평가 예정';
+        } else {
+          totalValLabel.innerHTML = '0.0<span class="holding-unit">억원</span>';
+          holdingsContainer.innerHTML = `<div class="empty-state">보유중인 가족사 주식 지분이 없습니다.</div>`;
+        }
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDashboard();
+    });
+  </script>
+</body>
+</html>
