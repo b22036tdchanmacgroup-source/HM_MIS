@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/HM_MISystem/',
+  base: '/HM_MIS/',
   plugins: [react()],
   server: {
     port: 5175,
