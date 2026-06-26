@@ -18,11 +18,16 @@ import CashflowMain from './components/Cashflow/CashflowMain';
 const DetailViewerWindow: React.FC = () => {
   const params = new URLSearchParams(window.location.search);
   const [currentUrl, setCurrentUrl] = useState<string | null>(params.get('detail'));
+  const [isCleared, setIsCleared] = useState(false);
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data?.type === 'showDetail' && e.data.url) {
         setCurrentUrl(e.data.url);
+        setIsCleared(false);
+      } else if (e.data?.type === 'clearDetail') {
+        setCurrentUrl(null);
+        setIsCleared(true);
       }
     };
     window.addEventListener('message', handler);
@@ -50,6 +55,11 @@ const DetailViewerWindow: React.FC = () => {
             style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
             title="상세 정보"
           />
+        ) : isCleared ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 12 }}>
+            <div style={{ fontSize: 40, opacity: 0.15, lineHeight: 1 }}>⊡</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#A3A3A3', letterSpacing: '-0.3px' }}>상세 페이지 준비중입니다</div>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 16, color: '#737373' }}>
             <div style={{ fontSize: 56, opacity: 0.2, lineHeight: 1 }}>⊞</div>
@@ -642,6 +652,13 @@ const App: React.FC = () => {
     }
     return () => { if (interval) clearInterval(interval); };
   }, [isDualMode]);
+
+  // 지배구조 페이지에서 벗어나면 child window 내용 클리어
+  useEffect(() => {
+    if (!showTeamView && childWindowRef.current && !childWindowRef.current.closed) {
+      childWindowRef.current.postMessage({ type: 'clearDetail' }, '*');
+    }
+  }, [showTeamView]);
 
   // postMessage listener: governance iframe → child detail-viewer window
   useEffect(() => {
